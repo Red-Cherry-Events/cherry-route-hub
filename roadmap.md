@@ -14,18 +14,22 @@
 - [x] Verify Everlytic enquiry/master lists and consent-only North interest recording, no schema change
 - [x] Test TDA regressions, endpoint flows, admin readback and both email sends (31 tests)
 - [x] Request publication after fresh security check
-- [ ] Confirm production CORS, waiting for scheduled deployment to finish
+- [x] Confirm production CORS for Sea to Sea enquiries, 204 with exact allowed origin
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
-- [ ] Match Everlytic reference 924774 and send four Shaun-only prefixed tests; keep series OFF
-- [ ] Establish exact Everlytic per-recipient capabilities and propose a verified delivery approach
+- [x] Port the approved ZIP generator exactly and verify all four supplied HTML fixtures
+- [x] Verify single-recipient automatic Everlytic delivery to Shaun, then enable only on acceptance (926591, one recipient, step 2 due 22 Nov)
+- [x] Verify 37 tests, all four signed-in previews, live images, single recipient delivery and private hourly schedule
+- [x] Request publication of approved templates and verified delivery result
+- [x] Approved rebuilt tests 926580 to 926583 supplied and accepted previously
+- [x] Transactional API denied 401 / 10001; verified fresh private one-contact campaigns instead
 - [x] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
 - [x] Build four reviewable marketing emails with live count rules, initially OFF
 - [x] Add Comms previews, signed-in admin tests and subscriber progress
 - [x] Verify local endpoint, admin flow, re-consent and 22 rules tests; request publication without subscriber sends
-- [ ] Connect verified one-recipient Everlytic marketing delivery and enable the usable switch, blocked by unverified provider delivery API; subscriber sends are code-blocked
+- [x] Connect verified one-recipient Everlytic marketing delivery and enable the usable switch
 - [x] Confirm deployment, production CORS for all three origins and live bad-email response
-- [ ] Verify email photography after the separate website deploy; supplied URLs currently show broken images as expected
+- [x] Use permanently hosted approved photography, JPG and PNG verified 200
 
 ## Grabouw bot correction (Shaun, 14 Nov)
 - [x] Save the confirmed Otto1890 Weekend Warrior Grabouw / Oak Valley dates, 2–4 April 2027

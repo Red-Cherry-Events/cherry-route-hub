@@ -1,0 +1,11 @@
+import {describe,it} from 'node:test';
+import assert from 'node:assert/strict';
+import {transactionalRequest,transactionId,newsletterContactState,isolatedListVerified,campaignAccepted} from './tda-newsletter-delivery.server';
+describe('Individual newsletter delivery',()=>{
+ it('accepts only the exact isolated list with one subscribed contact',()=>{const p={collection:[{data:{list_id:2,contact_id:3,email_status:'subscribed'}}]};assert.equal(isolatedListVerified(p,'2','3'),true);assert.equal(isolatedListVerified(p,'102600','3'),false);assert.equal(isolatedListVerified({collection:[...p.collection,...p.collection]},'2','3'),false);});
+ it('requires Everlytic queued acceptance for the exact campaign and list',()=>{assert.equal(campaignAccepted({item:{id:7,list_ids:'2',status:'pre-queue'}},'7','2'),true);assert.equal(campaignAccepted({item:{id:7,list_ids:'102600',status:'pre-queue'}},'7','2'),false);assert.equal(campaignAccepted({item:{id:7,list_ids:'2',status:'composing'}},'7','2'),false);});
+ it('targets exactly one address with the approved sender and reply address',()=>{const r=transactionalRequest('shaun@redcherryevents.co.za','Shaun','Approved','<html>approved</html>','key');assert.deepEqual(Object.keys(r.headers.to),['shaun@redcherryevents.co.za']);assert.deepEqual(r.headers.from,{'Team@redcherryevents.co.za':'M&G Investments Tour de Addo'});assert.deepEqual(r.headers.reply_to,{'team@redcherryevents.co.za':'Red Cherry Events'});assert.equal(r.body.html,'<html>approved</html>');});
+ it('requires a confirmed transaction identifier',()=>{assert.equal(transactionId({item:{transaction_id:'single-123'}}),'single-123');assert.throws(()=>transactionId({item:{}}));});
+ it('never bypasses an explicit opt-out on duplicate contacts',()=>{assert.equal(newsletterContactState({collection:[{data:{email:'a@b.co',status:'on',email_status:'none'}},{data:{email:'a@b.co',status:'on',email_status:'unsubscribed'}}]},'a@b.co'),'unsubscribed');});
+ it('handles historical bounced duplicates without changing any provider status',()=>{assert.equal(newsletterContactState({collection:[{data:{email:'a@b.co',status:'on',email_status:'bounced'}},{data:{email:'a@b.co',status:'on',email_status:'none'}}]},'a@b.co'),'active');});
+});

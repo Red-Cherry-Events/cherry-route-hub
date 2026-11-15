@@ -1,1 +1,1 @@
-- Tour de Addo newsletter uses private consent/progress records, Everlytic-only admin previews and the existing private hourly hook for sync retries; subscriber delivery stays code-blocked until a verified one-recipient marketing API is connected, preventing accidental list-wide sends.
+- Tour de Addo newsletter uses private consent/progress records and the existing private hourly hook; automatic delivery creates a private list per send and verifies exactly one subscribed contact plus the draft audience before dispatch, never using master lists or admin previews.
