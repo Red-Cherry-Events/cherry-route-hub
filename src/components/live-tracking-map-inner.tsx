@@ -22,6 +22,7 @@ import { navigationProgress } from '@/lib/fullscreen-navigation';
 import { toast } from "sonner";
 import type { CustomMarker } from "@/lib/mock-data";
 import { RouteProfile } from "@/components/route-profile";
+import { addStageLayers } from "@/lib/route-stage-layers";
 import { useRouteHover } from "@/lib/route-hover";
 import {
   fetchTeamLocationsCrew,
@@ -932,6 +933,9 @@ export default function LiveTrackingMapInner({
     if (!fullscreen && !fittedRef.current && bounds.length > 0) {
       map.fitBounds(L.latLngBounds(bounds).pad(0.1));
     }
+    const stageLayers = matchedRoutes.map((c) =>
+      addStageLayers(map, navigationLinesRef.current.get(c.route.id) ?? c.lines, c.route.stages, c.color),
+    );
     const stopArrows = addDirectionArrows(
       map,
       matchedRoutes.map((c) => ({ color: c.color, lines: navigationLinesRef.current.get(c.route.id) ?? c.lines })),
@@ -939,6 +943,7 @@ export default function LiveTrackingMapInner({
 
     return () => {
       stopArrows();
+      stageLayers.forEach((x) => x.remove());
       for (const [, polys] of routeLayersRef.current) polys.forEach((p) => p.remove());
       routeLayersRef.current.clear();
     };
