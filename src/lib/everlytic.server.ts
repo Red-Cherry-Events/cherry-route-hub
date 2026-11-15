@@ -14,8 +14,9 @@ export async function everlyticRequest(path: string, method: "GET" | "POST", use
     throw Object.assign(new Error("Everlytic redirected the request. Check the configured installation host."), { status: response.status });
   }
   if (!response.ok) {
-    // Provider bodies can echo credentials; do not log or return them.
-    throw Object.assign(new Error(`Everlytic request failed (${response.status}). ${response.status === 401 ? "Check your Everlytic username and API key." : response.status === 403 ? "Check this account's email permissions." : "Check the campaign in Everlytic and try again."}`), { status: response.status });
+    const raw = await response.text();
+    const safe = raw.split(apiKey).join('[redacted]').split(username).join('[redacted]').split(btoa(`${username}:${apiKey}`)).join('[redacted]').slice(0,2000);
+    throw Object.assign(new Error(`Everlytic request failed (${response.status}): ${safe}`), { status: response.status });
   }
   const payload = await response.json();
   if (payload === false || payload?.success === false || payload?.error) throw new Error("Everlytic did not accept the request. Check the campaign in Everlytic.");
