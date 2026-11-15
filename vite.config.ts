@@ -14,6 +14,8 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    // Vite consumes OPTIONS before application handlers in development.
+    server: { cors: { origin: ["https://tourdeaddo.com", "https://www.tourdeaddo.com", "https://tour-de-addo.vercel.app"], methods: ["GET", "POST", "OPTIONS"], allowedHeaders: ["Content-Type", "Accept", "Authorization"] } },
     plugins: [mcpPlugin()],
   },
 });

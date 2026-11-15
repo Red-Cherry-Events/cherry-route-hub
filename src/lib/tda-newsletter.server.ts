@@ -74,7 +74,7 @@ export async function newsletterPreview(admin:any,number:number,name:string,unsu
 }
 
 function providerId(payload:any) {
-  const id=payload?.data?.id??payload?.id??payload?.response?.id??(typeof payload==='number'?payload:null);
+  const id=payload?.item?.id??payload?.data?.id??payload?.id??payload?.response?.id??(typeof payload==='number'?payload:null);
   if(!/^\d+$/.test(String(id))) throw Error('Could not verify Everlytic record');
   return String(id);
 }
@@ -116,7 +116,7 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       let optedOut=!mayAddMembership(contact,null);
       for(const list of TDA_DEFAULT_LIST_IDS) {
         const raw=await everlyticRequest(`/api/2.0/list_subscriptions/${list}/${contact.id}`,'GET',u,k);
-        const mapping=raw.data??raw;
+        const mapping=raw.item??raw.data??raw;
         if(['off','unsubscribed','blocked','bounced'].includes(String(mapping.email_status??mapping.status))) optedOut=true;
       }
       if(optedOut) {await admin.from('tda_newsletter_signups').update({status:'unsubscribed',unsubscribed_at:new Date().toISOString()}).eq('id',row.id);continue;}
