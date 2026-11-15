@@ -25,6 +25,7 @@ import { Route as PromosRouteImport } from './routes/promos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SpectateRouteImport } from './routes/spectate'
+import { Route as TdaNewsletterUnsubscribeRouteImport } from './routes/tda-newsletter-unsubscribe'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -58,6 +59,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSignInsRouteImport } from './routes/admin.sign-ins'
 import { Route as AdminSocialRouteImport } from './routes/admin.social'
 import { Route as AdminSponsorsRouteImport } from './routes/admin.sponsors'
+import { Route as AdminTdaNewsletterRouteImport } from './routes/admin.tda-newsletter'
 import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminWebsiteEnquiriesRouteImport } from './routes/admin.website-enquiries'
 import { Route as AskEventIdRouteImport } from './routes/ask.$eventId'
@@ -97,6 +99,7 @@ import { Route as ApiPublicEventInterestUnsubscribeRouteImport } from './routes/
 import { Route as ApiPublicMarketingSnapshotRouteImport } from './routes/api/public/marketing-snapshot'
 import { Route as ApiPublicOgRouteImport } from './routes/api/public/og'
 import { Route as ApiPublicTdaEnquiryRouteImport } from './routes/api/public/tda-enquiry'
+import { Route as ApiPublicTdaNewsletterRouteImport } from './routes/api/public/tda-newsletter'
 import { Route as CrewDepartmentDeptIdRouteImport } from './routes/crew.department.$deptId'
 import { Route as CrewLearnIndexRouteImport } from './routes/crew.learn.index'
 import { Route as CrewLearnCourseIdRouteImport } from './routes/crew.learn.$courseId'
@@ -217,6 +220,12 @@ const SpectateRoute = SpectateRouteImport.update({
   path: '/spectate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TdaNewsletterUnsubscribeRoute =
+  TdaNewsletterUnsubscribeRouteImport.update({
+    id: '/tda-newsletter-unsubscribe',
+    path: '/tda-newsletter-unsubscribe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
   path: '/terms-of-service',
@@ -382,6 +391,11 @@ const AdminSocialRoute = AdminSocialRouteImport.update({
 const AdminSponsorsRoute = AdminSponsorsRouteImport.update({
   id: '/sponsors',
   path: '/sponsors',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTdaNewsletterRoute = AdminTdaNewsletterRouteImport.update({
+  id: '/tda-newsletter',
+  path: '/tda-newsletter',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTrackingRoute = AdminTrackingRouteImport.update({
@@ -581,6 +595,11 @@ const ApiPublicOgRoute = ApiPublicOgRouteImport.update({
 const ApiPublicTdaEnquiryRoute = ApiPublicTdaEnquiryRouteImport.update({
   id: '/api/public/tda-enquiry',
   path: '/api/public/tda-enquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTdaNewsletterRoute = ApiPublicTdaNewsletterRouteImport.update({
+  id: '/api/public/tda-newsletter',
+  path: '/api/public/tda-newsletter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrewDepartmentDeptIdRoute = CrewDepartmentDeptIdRouteImport.update({
@@ -815,6 +834,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
   '/spectate': typeof SpectateRouteWithChildren
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -847,6 +867,7 @@ export interface FileRoutesByFullPath {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -884,6 +905,7 @@ export interface FileRoutesByFullPath {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -941,6 +963,7 @@ export interface FileRoutesByTo {
   '/promos': typeof PromosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -973,6 +996,7 @@ export interface FileRoutesByTo {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -1009,6 +1033,7 @@ export interface FileRoutesByTo {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1070,6 +1095,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
   '/spectate': typeof SpectateRouteWithChildren
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1102,6 +1128,7 @@ export interface FileRoutesById {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -1139,6 +1166,7 @@ export interface FileRoutesById {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1201,6 +1229,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rewards'
     | '/spectate'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1233,6 +1262,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -1270,6 +1300,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1327,6 +1358,7 @@ export interface FileRouteTypes {
     | '/promos'
     | '/reset-password'
     | '/rewards'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1359,6 +1391,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -1395,6 +1428,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1455,6 +1489,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rewards'
     | '/spectate'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1487,6 +1522,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -1524,6 +1560,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1585,6 +1622,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RewardsRoute: typeof RewardsRoute
   SpectateRoute: typeof SpectateRouteWithChildren
+  TdaNewsletterUnsubscribeRoute: typeof TdaNewsletterUnsubscribeRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1613,6 +1651,7 @@ export interface RootRouteChildren {
   ApiPublicMarketingSnapshotRoute: typeof ApiPublicMarketingSnapshotRoute
   ApiPublicOgRoute: typeof ApiPublicOgRoute
   ApiPublicTdaEnquiryRoute: typeof ApiPublicTdaEnquiryRoute
+  ApiPublicTdaNewsletterRoute: typeof ApiPublicTdaNewsletterRoute
   CrewDepartmentDeptIdRoute: typeof CrewDepartmentDeptIdRoute
   CrewLearnCourseIdRoute: typeof CrewLearnCourseIdRoute
   CrewLearnCalendarRoute: typeof CrewLearnCalendarRoute
@@ -1762,6 +1801,13 @@ declare module '@tanstack/react-router' {
       path: '/spectate'
       fullPath: '/spectate'
       preLoaderRoute: typeof SpectateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tda-newsletter-unsubscribe': {
+      id: '/tda-newsletter-unsubscribe'
+      path: '/tda-newsletter-unsubscribe'
+      fullPath: '/tda-newsletter-unsubscribe'
+      preLoaderRoute: typeof TdaNewsletterUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms-of-service': {
@@ -1993,6 +2039,13 @@ declare module '@tanstack/react-router' {
       path: '/sponsors'
       fullPath: '/admin/sponsors'
       preLoaderRoute: typeof AdminSponsorsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tda-newsletter': {
+      id: '/admin/tda-newsletter'
+      path: '/tda-newsletter'
+      fullPath: '/admin/tda-newsletter'
+      preLoaderRoute: typeof AdminTdaNewsletterRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tracking': {
@@ -2266,6 +2319,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/tda-enquiry'
       fullPath: '/api/public/tda-enquiry'
       preLoaderRoute: typeof ApiPublicTdaEnquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tda-newsletter': {
+      id: '/api/public/tda-newsletter'
+      path: '/api/public/tda-newsletter'
+      fullPath: '/api/public/tda-newsletter'
+      preLoaderRoute: typeof ApiPublicTdaNewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crew/department/$deptId': {
@@ -2586,6 +2646,7 @@ interface AdminRouteChildren {
   AdminSignInsRoute: typeof AdminSignInsRoute
   AdminSocialRoute: typeof AdminSocialRoute
   AdminSponsorsRoute: typeof AdminSponsorsRoute
+  AdminTdaNewsletterRoute: typeof AdminTdaNewsletterRoute
   AdminTrackingRoute: typeof AdminTrackingRoute
   AdminWebsiteEnquiriesRoute: typeof AdminWebsiteEnquiriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -2629,6 +2690,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSignInsRoute: AdminSignInsRoute,
   AdminSocialRoute: AdminSocialRoute,
   AdminSponsorsRoute: AdminSponsorsRoute,
+  AdminTdaNewsletterRoute: AdminTdaNewsletterRoute,
   AdminTrackingRoute: AdminTrackingRoute,
   AdminWebsiteEnquiriesRoute: AdminWebsiteEnquiriesRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -2705,6 +2767,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RewardsRoute: RewardsRoute,
   SpectateRoute: SpectateRouteWithChildren,
+  TdaNewsletterUnsubscribeRoute: TdaNewsletterUnsubscribeRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
@@ -2735,6 +2798,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMarketingSnapshotRoute: ApiPublicMarketingSnapshotRoute,
   ApiPublicOgRoute: ApiPublicOgRoute,
   ApiPublicTdaEnquiryRoute: ApiPublicTdaEnquiryRoute,
+  ApiPublicTdaNewsletterRoute: ApiPublicTdaNewsletterRoute,
   CrewDepartmentDeptIdRoute: CrewDepartmentDeptIdRoute,
   CrewLearnCourseIdRoute: CrewLearnCourseIdRoute,
   CrewLearnCalendarRoute: CrewLearnCalendarRoute,
