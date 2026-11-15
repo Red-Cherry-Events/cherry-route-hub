@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { locateStages, stageAtKm } from "./route-stages";
 import type { LatLngAlt } from "./geo";
 
