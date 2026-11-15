@@ -10,6 +10,8 @@
 # Roadmap
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
+- [ ] Match Everlytic reference 924774 and send four Shaun-only prefixed tests; keep series OFF
+- [ ] Establish exact Everlytic per-recipient capabilities and propose a verified delivery approach
 - [x] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
 - [x] Build four reviewable marketing emails with live count rules, initially OFF
 - [x] Add Comms previews, signed-in admin tests and subscriber progress

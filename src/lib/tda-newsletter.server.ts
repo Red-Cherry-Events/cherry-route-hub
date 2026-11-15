@@ -1,6 +1,4 @@
-import { render } from '@react-email/render';
-import { createElement } from 'react';
-import { TdaNewsletterEmail } from './email-templates/tda-newsletter';
+import { renderTdaNewsletter } from './email-templates/tda-newsletter';
 import { buildAvailability } from './public-availability';
 import { newsletterSchema, newsletterSubject, emailDue, seriesStopped, type NewsletterCounts } from './tda-newsletter';
 import { isAllowedTdaOrigin, tdaCorsHeaders, TDA_DEFAULT_LIST_IDS } from './tda-enquiry';
@@ -69,7 +67,7 @@ export async function handleTdaNewsletter(request: Request) {
 }
 export async function newsletterPreview(admin:any,number:number,name:string,unsubscribeUrl:string) {
   const counts=await newsletterCounts(admin);
-  return {subject:newsletterSubject(number,counts),html:await render(createElement(TdaNewsletterEmail,{number,name,counts,unsubscribeUrl})),counts};
+  return {subject:newsletterSubject(number,counts),html:await renderTdaNewsletter({number,name,counts,unsubscribeUrl}),counts};
 }
 
 function providerId(payload:any) {
@@ -82,10 +80,11 @@ export async function sendNewsletterTest(admin:any,email:string,name:string,numb
   const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
   if(!u||!k) throw Error('Everlytic is not connected');
   // Composing draft has NO audience. Preview action targets the verified admin only.
-  const draft=await everlyticRequest('/api/2.0/emails','POST',u,k,{campaign_name:`TDA newsletter admin preview ${number} ${Date.now()}`,subject:preview.subject,from_email:'team@redcherryevents.co.za',from_name:'M&G Investments Tour de Addo',reply_email:'team@redcherryevents.co.za',html_original:preview.html,list_ids:'',insert_unsubscribe_link:'yes'});
+  const draft=await everlyticRequest('/api/2.0/emails','POST',u,k,{campaign_name:`TDA newsletter reference 924774 test ${number} ${Date.now()}`,subject:`[TEST ${number}/4] ${preview.subject}`,from_email:'Team@redcherryevents.co.za',from_name:'M&G Investments Tour de Addo',reply_email:'team@redcherryevents.co.za',html_original:preview.html,list_ids:'',insert_unsubscribe_link:'yes'});
   const id=providerId(draft);
-  await everlyticRequest(`/api/2.0/email_preview/${id}/${encodeURIComponent(email)}`,'POST',u,k);
-  return {ok:true};
+  const accepted=await everlyticRequest(`/api/2.0/email_preview/${id}/${encodeURIComponent(email)}`,'POST',u,k);
+  if(accepted.boolean!==true&&accepted.boolean!=='true') throw Error('Everlytic did not confirm the preview send.');
+  return {ok:true,messageId:id,counts:preview.counts};
 }
 
 export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:number}={}) {
