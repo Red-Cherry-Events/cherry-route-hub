@@ -14,12 +14,13 @@
 - [x] Verify Everlytic enquiry/master lists and consent-only North interest recording, no schema change
 - [x] Test TDA regressions, endpoint flows, admin readback and both email sends (31 tests)
 - [x] Request publication after fresh security check
-- [ ] Confirm production CORS, waiting for scheduled deployment to finish
+- [x] Confirm production CORS for Sea to Sea enquiries, 204 with exact allowed origin
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
 - [x] Port the approved ZIP generator exactly and verify all four supplied HTML fixtures
 - [x] Verify single-recipient automatic Everlytic delivery to Shaun, then enable only on acceptance (926591, one recipient, step 2 due 22 Nov)
-- [ ] Publish the approved templates and verified delivery result
+- [x] Verify 37 tests, all four signed-in previews, live images, single recipient delivery and private hourly schedule
+- [x] Request publication of approved templates and verified delivery result
 - [x] Approved rebuilt tests 926580 to 926583 supplied and accepted previously
 - [x] Transactional API denied 401 / 10001; verified fresh private one-contact campaigns instead
 - [x] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
