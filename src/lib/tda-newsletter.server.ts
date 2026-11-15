@@ -6,7 +6,6 @@ import { newsletterSchema, newsletterSubject, emailDue, seriesStopped, type News
 import { isAllowedTdaOrigin, tdaCorsHeaders, TDA_DEFAULT_LIST_IDS } from './tda-enquiry';
 import { syncContactToLists } from './tda-enquiry.server';
 import { everlyticRequest } from './everlytic.server';
-import { mayAddMembership } from './entry-interest-audience';
 
 export async function newsletterCounts(admin: any): Promise<NewsletterCounts> {
   const { data: events, error } = await admin.from('events').select('id,slug,entry_ninja_id,classes,capacity,title_sponsor_logo_url').in('entry_ninja_id', ['84152','84785']);
@@ -26,7 +25,7 @@ export async function newsletterCounts(admin: any): Promise<NewsletterCounts> {
 export async function hasTdaEntry(admin: any, email: string) {
   const { data: events, error } = await admin.from('events').select('id').in('entry_ninja_id',['84152','84785']);
   if (error || events?.length !== 2) throw Error('Could not check entries');
-  const { data, error: e } = await admin.from('event_entrants').select('entrants!inner(email)').in('event_id', events.map((r: any) => r.id)).ilike('entrants.email', email.replace(/[\\%_]/g, '\\$&')).limit(10);
+  const { data, error: e } = await admin.from('event_entrants').select('entrants!inner(email)').in('event_id', events.map((r: any) => r.id)).limit(10000);
   if(e) throw Error('Could not check entries');
   return (data ?? []).some((r: any) => String(r.entrants?.email ?? '').trim().toLowerCase() === email.trim().toLowerCase());
 }
@@ -78,10 +77,6 @@ function providerId(payload:any) {
   if(!/^\d+$/.test(String(id))) throw Error('Could not verify Everlytic record');
   return String(id);
 }
-async function contactFor(email:string,u:string,k:string) {
-  const raw=await everlyticRequest(`/api/2.0/contacts?filters[email]=${encodeURIComponent(email)}&count=25`,'GET',u,k);
-  return (raw.collection??[]).map((x:any)=>x.data??x).find((r:any)=>String(r.email).trim().toLowerCase()===email);
-}
 export async function sendNewsletterTest(admin:any,email:string,name:string,number:number) {
   const preview=await newsletterPreview(admin,number,name,'https://riderhub.redcherryevents.co.za/tda-newsletter-unsubscribe?test=1');
   const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
@@ -94,15 +89,18 @@ export async function sendNewsletterTest(admin:any,email:string,name:string,numb
 }
 
 export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:number}={}) {
+  // A campaign-list send is not a verified one-recipient delivery API.
+  // Never create subscriber-specific lists or reuse admin previews for marketing delivery.
+  // Until that boundary is verified, all subscriber sends remain blocked in code,
+  // even if the database configuration is changed outside the admin screen.
+  const {data:pending}=await admin.from('tda_newsletter_signups').select('id').eq('everlytic_synced',false).eq('status','active').limit(10);
+  for(const row of pending??[]) await syncNewsletter(admin,row.id);
   const {data:config}=await admin.from('tda_newsletter_campaign').select('*').eq('id',true).maybeSingle();
   if(!config?.enabled || !config.delivery_verified) return {sent:0,disabled:true};
-  const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
-  if(!u||!k) return {sent:0,disabled:true};
   let query=admin.from('tda_newsletter_signups').select('*').eq('status','active').order('consent_at').limit(opts.limit??30);
   if(opts.id) query=query.eq('id',opts.id);
   const {data:rows,error}=await query;
   if(error) throw Error('Could not load sign-ups');
-  let sent=0;
   for(const row of rows??[]) {
     try {
       if(await hasTdaEntry(admin,row.email)) {await admin.from('tda_newsletter_signups').update({status:'entered'}).eq('id',row.id);continue;}
@@ -111,36 +109,8 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       const start=row.series_started_at??new Date().toISOString();
       if(!row.series_started_at) await admin.from('tda_newsletter_signups').update({series_started_at:start}).eq('id',row.id).eq('generation',row.generation);
       if(!emailDue(start,row.next_email)) continue;
-      const contact=await contactFor(row.email,u,k);
-      if(!contact) {await syncNewsletter(admin,row.id);continue;}
-      let optedOut=!mayAddMembership(contact,null);
-      for(const list of TDA_DEFAULT_LIST_IDS) {
-        const raw=await everlyticRequest(`/api/2.0/list_subscriptions/${list}/${contact.id}`,'GET',u,k);
-        const mapping=raw.item??raw.data??raw;
-        if(['off','unsubscribed','blocked','bounced'].includes(String(mapping.email_status??mapping.status))) optedOut=true;
-      }
-      if(optedOut) {await admin.from('tda_newsletter_signups').update({status:'unsubscribed',unsubscribed_at:new Date().toISOString()}).eq('id',row.id);continue;}
-      const {data:claim,error:ce}=await admin.from('tda_newsletter_sends').insert({signup_id:row.id,generation:row.generation,email_number:row.next_email}).select('id').single();
-      if(ce || !claim) continue; // Unique claim: ambiguous sends are never automatically retried.
-      try {
-        const unsub=`https://riderhub.redcherryevents.co.za/tda-newsletter-unsubscribe?token=${row.unsubscribe_token}`;
-        const preview=await newsletterPreview(admin,row.next_email,row.name??'',unsub);
-        const list=providerId(await everlyticRequest('/api/2.0/lists','POST',u,k,{name:`TDA series ${claim.id}`,owner_email:'team@redcherryevents.co.za',public_name:'Tour de Addo news'}));
-        await admin.from('tda_newsletter_sends').update({provider_list_id:list}).eq('id',claim.id);
-        await everlyticRequest(`/api/2.0/list_subscriptions/${list}`,'POST',u,k,{contact_id:contact.id,email_status:'subscribed'});
-        const draft=providerId(await everlyticRequest('/api/2.0/emails','POST',u,k,{campaign_name:`TDA series ${claim.id}`,subject:preview.subject,from_email:'team@redcherryevents.co.za',from_name:'M&G Investments Tour de Addo',reply_email:'team@redcherryevents.co.za',html_original:preview.html,list_ids:list,insert_unsubscribe_link:'yes'}));
-        await admin.from('tda_newsletter_sends').update({provider_email_id:draft}).eq('id',claim.id);
-        const {data:fresh}=await admin.from('tda_newsletter_signups').select('status,generation').eq('id',row.id).single();
-        const {data:gate}=await admin.from('tda_newsletter_campaign').select('enabled,delivery_verified').eq('id',true).single();
-        if(fresh?.status!=='active'||fresh.generation!==row.generation||!gate?.enabled||!gate.delivery_verified||await hasTdaEntry(admin,row.email)||seriesStopped(await newsletterCounts(admin))) {
-          await admin.from('tda_newsletter_sends').update({status:'stopped'}).eq('id',claim.id);continue;
-        }
-        await everlyticRequest(`/api/2.0/email_actions/send/${draft}`,'POST',u,k);
-        await admin.from('tda_newsletter_sends').update({status:'accepted'}).eq('id',claim.id);
-        await admin.from('tda_newsletter_signups').update({next_email:row.next_email+1,status:row.next_email===4?'finished':'active'}).eq('id',row.id).eq('status','active').eq('generation',row.generation);
-        sent++;
-      } catch(e) {await admin.from('tda_newsletter_sends').update({status:'uncertain',error:(e as Error).message.slice(0,300)}).eq('id',claim.id);}
+      // Leave this step pending, never count an unsent message as sent.
     } catch(e) {await admin.from('tda_newsletter_signups').update({everlytic_error:(e as Error).message.slice(0,300)}).eq('id',row.id);}
   }
-  return {sent,disabled:false};
+  return {sent:0,disabled:true,reason:'Individual Everlytic delivery is not verified'};
 }
