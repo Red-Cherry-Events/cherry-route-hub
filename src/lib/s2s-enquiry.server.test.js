@@ -2,7 +2,7 @@ import { afterAll, expect, mock, test } from 'bun:test';
 let row = null;
 let interest = null;
 let quotaAllowed = true;
-const sent[] = [];
+const sent = [];
 mock.module('@/integrations/supabase/client.server', () => ({ supabaseAdmin: {
   rpc: async () => ({ data: quotaAllowed, error: null }),
   from: () => ({
