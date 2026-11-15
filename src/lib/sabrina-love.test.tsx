@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
-import { KCA_URL } from "./sabrina-love";
+import { DEFAULT_KCA_DONATE_URL, KCA_URL, isPublicGivenGainUrl, kcaDonateUrl } from "./sabrina-love";
 import { RaisedProgress, SlscKcaCard, formatRand } from "@/components/slsc-kca-card";
 import { KcaMatchBand } from "@/lib/email-templates/sabrina-love-brand";
 
@@ -30,7 +30,8 @@ describe("Sabrina Love approved KCA campaign", () => {
     const html = renderToStaticMarkup(<SlscKcaCard entryUrl={ENTRY_URL} />);
     assert.match(html, new RegExp(`href="${ENTRY_URL}"`));
     assert.match(html, /data-track-action="slsc_entry_donation_opened"/);
-    assert.match(html, /href="https:\/\/www\.givengain\.com\/cc\/sabrinalove"/);
+    assert.match(html, /href="https:\/\/www\.givengain\.com\/event\/donate-now-7778"/);
+    assert.match(html, /href="\/kca"/);
   });
 
   it("shows only the R1m goal until an admin enters a real raised figure", () => {
@@ -52,5 +53,24 @@ describe("Sabrina Love approved KCA campaign", () => {
 
   it("formats the animated Rand total with comma separators", () => {
     assert.equal(formatRand(1234567), "R1,234,567");
+  });
+});
+
+describe("KCA donate link", () => {
+  it("defaults to the Summer Challenge GivenGain page", () => {
+    assert.equal(kcaDonateUrl(""), DEFAULT_KCA_DONATE_URL);
+    assert.equal(kcaDonateUrl(undefined), DEFAULT_KCA_DONATE_URL);
+  });
+
+  it("never sends riders to the organiser dashboard or a non-GivenGain site", () => {
+    assert.equal(kcaDonateUrl("https://www.givengain.com/my-events/manage"), DEFAULT_KCA_DONATE_URL);
+    assert.equal(kcaDonateUrl("http://www.givengain.com/event/donate-now-7778"), DEFAULT_KCA_DONATE_URL);
+    assert.equal(kcaDonateUrl("https://evilgivengain.com/event/1"), DEFAULT_KCA_DONATE_URL);
+    assert.equal(kcaDonateUrl("not a link"), DEFAULT_KCA_DONATE_URL);
+  });
+
+  it("uses an admin's public GivenGain page when one is set", () => {
+    assert.equal(kcaDonateUrl(" https://www.givengain.com/cc/sabrinalove "), "https://www.givengain.com/cc/sabrinalove");
+    assert.equal(isPublicGivenGainUrl("https://givengain.com/event/donate-now-7778"), true);
   });
 });

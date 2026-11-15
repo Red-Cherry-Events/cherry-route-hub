@@ -63,6 +63,8 @@ export type KcaCampaign = {
   raised: number | null;
   goal: number;
   updated: string;
+  /** Public GivenGain page for donations; blank uses DEFAULT_KCA_DONATE_URL. */
+  donateUrl?: string;
 };
 
 export type SiteSettings = {
@@ -107,6 +109,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     raised: null,
     goal: 1_000_000,
     updated: "",
+    donateUrl: "",
   },
 };
 
