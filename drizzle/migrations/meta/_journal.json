@@ -351,6 +351,13 @@
       "when": 1794584608993,
       "tag": "0049_public_slsc_kca_campaign_setting",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794718271768,
+      "tag": "0050_tda_newsletter",
+      "breakpoints": true
     }
   ]
 }

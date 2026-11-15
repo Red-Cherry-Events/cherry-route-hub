@@ -4105,6 +4105,125 @@ export type Database = {
         }
         Relationships: []
       }
+      tda_newsletter_campaign: {
+        Row: {
+          delivery_verified: boolean
+          enabled: boolean
+          enabled_at: string | null
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          delivery_verified?: boolean
+          enabled?: boolean
+          enabled_at?: string | null
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          delivery_verified?: boolean
+          enabled?: boolean
+          enabled_at?: string | null
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tda_newsletter_sends: {
+        Row: {
+          created_at: string
+          email_number: number
+          error: string | null
+          generation: number
+          id: string
+          provider_email_id: string | null
+          provider_list_id: string | null
+          signup_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email_number: number
+          error?: string | null
+          generation: number
+          id?: string
+          provider_email_id?: string | null
+          provider_list_id?: string | null
+          signup_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email_number?: number
+          error?: string | null
+          generation?: number
+          id?: string
+          provider_email_id?: string | null
+          provider_list_id?: string | null
+          signup_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tda_newsletter_sends_signup_id_fkey"
+            columns: ["signup_id"]
+            isOneToOne: false
+            referencedRelation: "tda_newsletter_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tda_newsletter_signups: {
+        Row: {
+          consent_at: string
+          created_at: string
+          email: string
+          everlytic_error: string | null
+          everlytic_synced: boolean
+          generation: number
+          id: string
+          name: string | null
+          next_email: number
+          series_started_at: string | null
+          source: string | null
+          status: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          consent_at?: string
+          created_at?: string
+          email: string
+          everlytic_error?: string | null
+          everlytic_synced?: boolean
+          generation?: number
+          id?: string
+          name?: string | null
+          next_email?: number
+          series_started_at?: string | null
+          source?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          consent_at?: string
+          created_at?: string
+          email?: string
+          everlytic_error?: string | null
+          everlytic_synced?: boolean
+          generation?: number
+          id?: string
+          name?: string | null
+          next_email?: number
+          series_started_at?: string | null
+          source?: string | null
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
       tracking_points: {
         Row: {
           accuracy_m: number | null
@@ -4468,6 +4587,14 @@ export type Database = {
         Returns: undefined
       }
       promo_engagement_summary: { Args: { _since: string }; Returns: Json }
+      set_tda_newsletter_enabled: {
+        Args: { _enabled: boolean }
+        Returns: undefined
+      }
+      subscribe_tda_newsletter: {
+        Args: { _email: string; _name: string; _source: string }
+        Returns: string
+      }
       verify_cron_key: { Args: { _key: string }; Returns: boolean }
     }
     Enums: {
