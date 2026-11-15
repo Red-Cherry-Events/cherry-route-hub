@@ -17,6 +17,9 @@
 - [ ] Confirm production CORS, waiting for scheduled deployment to finish
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
+- [ ] Port the approved ZIP generator exactly and verify all four supplied HTML fixtures
+- [ ] Verify single-recipient automatic Everlytic delivery to Shaun, then enable only on acceptance
+- [ ] Publish the approved templates and verified delivery result
 - [ ] Match Everlytic reference 924774 and send four Shaun-only prefixed tests; keep series OFF
 - [ ] Establish exact Everlytic per-recipient capabilities and propose a verified delivery approach
 - [x] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
