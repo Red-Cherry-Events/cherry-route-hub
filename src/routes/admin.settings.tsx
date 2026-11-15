@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useAdminStore } from "@/lib/store";
 import { useHydratedStore } from "@/lib/use-hydrated-store";
+import { DEFAULT_KCA_DONATE_URL, isPublicGivenGainUrl } from "@/lib/sabrina-love";
 import {
   QUICK_LINK_ICONS,
   saveBranding,
@@ -510,6 +511,10 @@ function KcaCampaignCard({
       setError("The raised amount must be zero or more, or left blank.");
       return;
     }
+    if (value.donateUrl?.trim() && !isPublicGivenGainUrl(value.donateUrl)) {
+      setError("Use a public GivenGain page (https://www.givengain.com/...), not the organiser dashboard.");
+      return;
+    }
     setError("");
     setSaving(true);
     const ok = await saveKcaCampaign(value);
@@ -565,8 +570,21 @@ function KcaCampaignCard({
           />
         </Field>
       </div>
+      <div className="mt-3">
+        <Field label="GivenGain donate page">
+          <input
+            type="url"
+            inputMode="url"
+            className={input()}
+            value={value.donateUrl ?? ""}
+            placeholder={DEFAULT_KCA_DONATE_URL}
+            onChange={(e) => onChange({ ...value, donateUrl: e.target.value })}
+          />
+        </Field>
+      </div>
       <p className="mt-3 text-xs leading-relaxed text-ink-soft">
         Leave the raised amount blank to hide the total and progress bar. The campaign goal still shows on every event.
+        The donate page must be a public GivenGain link, never the organiser dashboard; leave it blank to use the Summer Challenge page.
       </p>
       {error ? <p role="alert" className="mt-3 text-xs font-semibold text-cherry">{error}</p> : null}
       <SaveBar dirty={dirty} saving={saving} saved={saved} onSave={submit} />

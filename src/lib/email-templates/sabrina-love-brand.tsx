@@ -4,7 +4,7 @@ import kcaLogo from '@/assets/kca-logo.png.asset.json'
 import discoveryLogo from '@/assets/discovery-logo.jpg.asset.json'
 import slLogo from '@/assets/sabrina-love-logo.png.asset.json'
 import rceLogo from '@/assets/rce-logo.png.asset.json'
-import { KCA_URL } from '@/lib/sabrina-love'
+import { DEFAULT_KCA_DONATE_URL, KCA_URL } from '@/lib/sabrina-love'
 
 const absolute = (url: string) => new URL(url, 'https://riderhub.redcherryevents.co.za').href
 
@@ -30,7 +30,7 @@ export const sl = {
 }
 
 export const SLSC_SITE = 'https://sabrinalove.co.za/summer-challenge-2026/'
-export const SLSC_GIVENGAIN = 'https://www.givengain.com/cc/sabrinalove'
+export const SLSC_GIVENGAIN = DEFAULT_KCA_DONATE_URL
 export const SLSC_WHATSAPP = 'https://wa.me/27788038978'
 
 export function SlscHeader({ dayLabel, photoUrl, photoAlt }: { dayLabel: string; photoUrl: string; photoAlt: string }) {

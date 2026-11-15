@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Heart } from "lucide-react";
 import kcaLogo from "@/assets/kca-logo.png.asset.json";
 import discoveryLogo from "@/assets/discovery-logo.jpg.asset.json";
-import { KCA_URL } from "@/lib/sabrina-love";
+import { KCA_URL, kcaDonateUrl } from "@/lib/sabrina-love";
 import { useAdminStore } from "@/lib/store";
 
-const SLSC_GRADIENT = "linear-gradient(135deg, #A3005A 0%, #E6007E 52%, #FF3D9A 100%)";
-const SLSC_PINK = "#E6007E";
-const SUN_YELLOW = "#FFC83D";
-const GIVENGAIN_URL = "https://www.givengain.com/cc/sabrinalove";
+export const SLSC_GRADIENT = "linear-gradient(135deg, #A3005A 0%, #E6007E 52%, #FF3D9A 100%)";
+export const SLSC_PINK = "#E6007E";
+export const SUN_YELLOW = "#FFC83D";
 
 /** Sabrina Love Summer Challenge events get the approved KCA matching campaign. */
 export function isSabrinaLoveEvent(name?: string | null) {
@@ -86,6 +85,7 @@ export function SlscKcaCard({
 }) {
   const campaign = useAdminStore((s) => s.settings.kcaCampaign);
   const goal = campaign.goal;
+  const donateUrl = kcaDonateUrl(campaign.donateUrl);
   const hasRaisedFigure = campaign.raised !== null && Number.isFinite(campaign.raised);
 
   return (
@@ -139,7 +139,7 @@ export function SlscKcaCard({
           </a>
         ) : null}
         <a
-          href={GIVENGAIN_URL}
+          href={donateUrl}
           target="_blank"
           rel="noreferrer"
           data-track-action="slsc_donate_opened"
@@ -148,7 +148,14 @@ export function SlscKcaCard({
           Donate on GivenGain <Heart className="h-4 w-4 fill-current" aria-hidden="true" />
         </a>
       </div>
-      <div className="mt-2 text-center">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-3">
+        <a
+          href="/kca"
+          data-track-action="kca_page_opened"
+          className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-primary-foreground underline decoration-primary-foreground/60 underline-offset-4"
+        >
+          How the match works <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </a>
         <a
           href={KCA_URL}
           target="_blank"

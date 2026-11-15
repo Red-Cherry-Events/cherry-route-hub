@@ -16,6 +16,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as IceSignupRouteImport } from './routes/ice-signup'
 import { Route as IceSignupInlineRouteImport } from './routes/ice-signup-inline'
+import { Route as KcaRouteImport } from './routes/kca'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MyEventsRouteImport } from './routes/my-events'
 import { Route as Otto1890SignupRouteImport } from './routes/otto1890-signup'
@@ -173,6 +174,11 @@ const IceSignupRoute = IceSignupRouteImport.update({
 const IceSignupInlineRoute = IceSignupInlineRouteImport.update({
   id: '/ice-signup-inline',
   path: '/ice-signup-inline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KcaRoute = KcaRouteImport.update({
+  id: '/kca',
+  path: '/kca',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -825,6 +831,7 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/ice-signup': typeof IceSignupRoute
   '/ice-signup-inline': typeof IceSignupInlineRoute
+  '/kca': typeof KcaRoute
   '/mcp': typeof McpRoute
   '/my-events': typeof MyEventsRouteWithChildren
   '/otto1890-signup': typeof Otto1890SignupRoute
@@ -956,6 +963,7 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/ice-signup': typeof IceSignupRoute
   '/ice-signup-inline': typeof IceSignupInlineRoute
+  '/kca': typeof KcaRoute
   '/mcp': typeof McpRoute
   '/otto1890-signup': typeof Otto1890SignupRoute
   '/policy': typeof PolicyRoute
@@ -1086,6 +1094,7 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/ice-signup': typeof IceSignupRoute
   '/ice-signup-inline': typeof IceSignupInlineRoute
+  '/kca': typeof KcaRoute
   '/mcp': typeof McpRoute
   '/my-events': typeof MyEventsRouteWithChildren
   '/otto1890-signup': typeof Otto1890SignupRoute
@@ -1220,6 +1229,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/ice-signup'
     | '/ice-signup-inline'
+    | '/kca'
     | '/mcp'
     | '/my-events'
     | '/otto1890-signup'
@@ -1351,6 +1361,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/ice-signup'
     | '/ice-signup-inline'
+    | '/kca'
     | '/mcp'
     | '/otto1890-signup'
     | '/policy'
@@ -1480,6 +1491,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/ice-signup'
     | '/ice-signup-inline'
+    | '/kca'
     | '/mcp'
     | '/my-events'
     | '/otto1890-signup'
@@ -1613,6 +1625,7 @@ export interface RootRouteChildren {
   GalleryRoute: typeof GalleryRoute
   IceSignupRoute: typeof IceSignupRoute
   IceSignupInlineRoute: typeof IceSignupInlineRoute
+  KcaRoute: typeof KcaRoute
   McpRoute: typeof McpRoute
   MyEventsRoute: typeof MyEventsRouteWithChildren
   Otto1890SignupRoute: typeof Otto1890SignupRoute
@@ -1738,6 +1751,13 @@ declare module '@tanstack/react-router' {
       path: '/ice-signup-inline'
       fullPath: '/ice-signup-inline'
       preLoaderRoute: typeof IceSignupInlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kca': {
+      id: '/kca'
+      path: '/kca'
+      fullPath: '/kca'
+      preLoaderRoute: typeof KcaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -2758,6 +2778,7 @@ const rootRouteChildren: RootRouteChildren = {
   GalleryRoute: GalleryRoute,
   IceSignupRoute: IceSignupRoute,
   IceSignupInlineRoute: IceSignupInlineRoute,
+  KcaRoute: KcaRoute,
   McpRoute: McpRoute,
   MyEventsRoute: MyEventsRouteWithChildren,
   Otto1890SignupRoute: Otto1890SignupRoute,
