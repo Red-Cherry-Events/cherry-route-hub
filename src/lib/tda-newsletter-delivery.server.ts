@@ -25,6 +25,10 @@ function recordId(payload:any) {
   if(!/^\d+$/.test(String(id))) throw Error(`Everlytic record was not confirmed: ${JSON.stringify(payload).slice(0,1500)}`);
   return String(id);
 }
+export function campaignAccepted(payload:any,messageId:string,listId:string) {
+  const d=payload.item?.data??payload.item;
+  return String(d?.id)===messageId&&String(d?.list_ids)===listId&&['pre-queue','queued','sending','sent'].includes(d?.status);
+}
 export async function sendIndividualNewsletter(email:string,name:string,subject:string,html:string,key:string,onPrepared?:(listId:string,messageId:string)=>Promise<void>,canSend?:()=>Promise<boolean>) {
   const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
   if(!u||!k) throw Error('Everlytic is not connected');
@@ -55,6 +59,9 @@ export async function sendIndividualNewsletter(email:string,name:string,subject:
   const current=await request(`/api/2.0/contacts?filters[email]=${encodeURIComponent(email)}&count=25`,'GET');
   if(newsletterContactState(current,email)!=='active') throw Error('Recipient opted out before dispatch. No send attempted.');
   const accepted=await request(`/api/2.0/email_actions/send/${messageId}`,'POST');
-  if(accepted.boolean!==true&&accepted.boolean!=='true') throw Error(`Everlytic did not confirm campaign send: ${JSON.stringify(accepted).slice(0,1500)}`);
+  if(!campaignAccepted(accepted,messageId,listId)) {
+    const readback=await request(`/api/2.0/emails/${messageId}`,'GET');
+    if(!campaignAccepted(readback,messageId,listId)) throw Error(`Everlytic did not confirm campaign send: ${JSON.stringify({id:readback.item?.id,status:readback.item?.status,list_ids:readback.item?.list_ids})}`);
+  }
   return { messageId, listId, method:'isolated one-contact campaign' };
 }
