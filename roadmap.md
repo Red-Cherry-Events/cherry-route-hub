@@ -10,10 +10,13 @@
 # Roadmap
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
-- [ ] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
-- [ ] Build four reviewable marketing emails with live counts and entered/unsubscribe stop checks, initially OFF
-- [ ] Add Comms previews, signed-in admin tests, subscriber progress and on/off switch
-- [ ] Verify endpoint, admin flow and rules; publish without sending to subscribers
+- [x] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
+- [x] Build four reviewable marketing emails with live count rules, initially OFF
+- [x] Add Comms previews, signed-in admin tests and subscriber progress
+- [x] Verify local endpoint, admin flow, re-consent and 22 rules tests; request publication without subscriber sends
+- [ ] Connect verified one-recipient Everlytic marketing delivery and enable the usable switch, blocked by unverified provider delivery API; subscriber sends are code-blocked
+- [ ] Confirm deployment and production CORS, endpoint still returned 404 during deployment check
+- [ ] Verify email photography after the separate website deploy; supplied URLs currently show broken images as expected
 
 ## Grabouw bot correction (Shaun, 14 Nov)
 - [x] Save the confirmed Otto1890 Weekend Warrior Grabouw / Oak Valley dates, 2–4 April 2027
