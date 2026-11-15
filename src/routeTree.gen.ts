@@ -59,6 +59,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSignInsRouteImport } from './routes/admin.sign-ins'
 import { Route as AdminSocialRouteImport } from './routes/admin.social'
 import { Route as AdminSponsorsRouteImport } from './routes/admin.sponsors'
+import { Route as AdminTdaNewsletterRouteImport } from './routes/admin.tda-newsletter'
 import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminWebsiteEnquiriesRouteImport } from './routes/admin.website-enquiries'
 import { Route as AskEventIdRouteImport } from './routes/ask.$eventId'
@@ -390,6 +391,11 @@ const AdminSocialRoute = AdminSocialRouteImport.update({
 const AdminSponsorsRoute = AdminSponsorsRouteImport.update({
   id: '/sponsors',
   path: '/sponsors',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTdaNewsletterRoute = AdminTdaNewsletterRouteImport.update({
+  id: '/tda-newsletter',
+  path: '/tda-newsletter',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTrackingRoute = AdminTrackingRouteImport.update({
@@ -861,6 +867,7 @@ export interface FileRoutesByFullPath {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -989,6 +996,7 @@ export interface FileRoutesByTo {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -1120,6 +1128,7 @@ export interface FileRoutesById {
   '/admin/sign-ins': typeof AdminSignInsRoute
   '/admin/social': typeof AdminSocialRoute
   '/admin/sponsors': typeof AdminSponsorsRoute
+  '/admin/tda-newsletter': typeof AdminTdaNewsletterRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
@@ -1253,6 +1262,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -1381,6 +1391,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -1511,6 +1522,7 @@ export interface FileRouteTypes {
     | '/admin/sign-ins'
     | '/admin/social'
     | '/admin/sponsors'
+    | '/admin/tda-newsletter'
     | '/admin/tracking'
     | '/admin/website-enquiries'
     | '/ask/$eventId'
@@ -2027,6 +2039,13 @@ declare module '@tanstack/react-router' {
       path: '/sponsors'
       fullPath: '/admin/sponsors'
       preLoaderRoute: typeof AdminSponsorsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tda-newsletter': {
+      id: '/admin/tda-newsletter'
+      path: '/tda-newsletter'
+      fullPath: '/admin/tda-newsletter'
+      preLoaderRoute: typeof AdminTdaNewsletterRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tracking': {
@@ -2627,6 +2646,7 @@ interface AdminRouteChildren {
   AdminSignInsRoute: typeof AdminSignInsRoute
   AdminSocialRoute: typeof AdminSocialRoute
   AdminSponsorsRoute: typeof AdminSponsorsRoute
+  AdminTdaNewsletterRoute: typeof AdminTdaNewsletterRoute
   AdminTrackingRoute: typeof AdminTrackingRoute
   AdminWebsiteEnquiriesRoute: typeof AdminWebsiteEnquiriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -2670,6 +2690,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSignInsRoute: AdminSignInsRoute,
   AdminSocialRoute: AdminSocialRoute,
   AdminSponsorsRoute: AdminSponsorsRoute,
+  AdminTdaNewsletterRoute: AdminTdaNewsletterRoute,
   AdminTrackingRoute: AdminTrackingRoute,
   AdminWebsiteEnquiriesRoute: AdminWebsiteEnquiriesRoute,
   AdminIndexRoute: AdminIndexRoute,
