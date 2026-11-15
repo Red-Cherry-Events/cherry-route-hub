@@ -10,9 +10,10 @@
 # Roadmap
 
 ## JBFE Sea to Sea website enquiries (Shaun, 15 Nov)
-- [ ] Add validated public enquiry endpoint, stored admin rows and action-triggered emails
-- [ ] Verify Everlytic enquiry/master lists and consent-only North interest recording
-- [ ] Test TDA regressions, endpoint flows and email acceptance, then publish
+- [x] Add validated public enquiry endpoint, stored admin rows and action-triggered emails
+- [x] Verify Everlytic enquiry/master lists and consent-only North interest recording, no schema change
+- [x] Test TDA regressions, endpoint flows, admin readback and both email sends (31 tests)
+- [ ] Publish and confirm production CORS
 
 ## Tour de Addo newsletter (Shaun, 15 Nov)
 - [ ] Match Everlytic reference 924774 and send four Shaun-only prefixed tests; keep series OFF
