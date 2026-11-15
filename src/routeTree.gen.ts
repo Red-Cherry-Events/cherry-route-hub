@@ -25,6 +25,7 @@ import { Route as PromosRouteImport } from './routes/promos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SpectateRouteImport } from './routes/spectate'
+import { Route as TdaNewsletterUnsubscribeRouteImport } from './routes/tda-newsletter-unsubscribe'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -97,6 +98,7 @@ import { Route as ApiPublicEventInterestUnsubscribeRouteImport } from './routes/
 import { Route as ApiPublicMarketingSnapshotRouteImport } from './routes/api/public/marketing-snapshot'
 import { Route as ApiPublicOgRouteImport } from './routes/api/public/og'
 import { Route as ApiPublicTdaEnquiryRouteImport } from './routes/api/public/tda-enquiry'
+import { Route as ApiPublicTdaNewsletterRouteImport } from './routes/api/public/tda-newsletter'
 import { Route as CrewDepartmentDeptIdRouteImport } from './routes/crew.department.$deptId'
 import { Route as CrewLearnIndexRouteImport } from './routes/crew.learn.index'
 import { Route as CrewLearnCourseIdRouteImport } from './routes/crew.learn.$courseId'
@@ -217,6 +219,12 @@ const SpectateRoute = SpectateRouteImport.update({
   path: '/spectate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TdaNewsletterUnsubscribeRoute =
+  TdaNewsletterUnsubscribeRouteImport.update({
+    id: '/tda-newsletter-unsubscribe',
+    path: '/tda-newsletter-unsubscribe',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
   id: '/terms-of-service',
   path: '/terms-of-service',
@@ -583,6 +591,11 @@ const ApiPublicTdaEnquiryRoute = ApiPublicTdaEnquiryRouteImport.update({
   path: '/api/public/tda-enquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTdaNewsletterRoute = ApiPublicTdaNewsletterRouteImport.update({
+  id: '/api/public/tda-newsletter',
+  path: '/api/public/tda-newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CrewDepartmentDeptIdRoute = CrewDepartmentDeptIdRouteImport.update({
   id: '/crew/department/$deptId',
   path: '/crew/department/$deptId',
@@ -815,6 +828,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
   '/spectate': typeof SpectateRouteWithChildren
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -884,6 +898,7 @@ export interface FileRoutesByFullPath {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -941,6 +956,7 @@ export interface FileRoutesByTo {
   '/promos': typeof PromosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1009,6 +1025,7 @@ export interface FileRoutesByTo {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1070,6 +1087,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/rewards': typeof RewardsRoute
   '/spectate': typeof SpectateRouteWithChildren
+  '/tda-newsletter-unsubscribe': typeof TdaNewsletterUnsubscribeRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1139,6 +1157,7 @@ export interface FileRoutesById {
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
+  '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1201,6 +1220,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rewards'
     | '/spectate'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1270,6 +1290,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1327,6 +1348,7 @@ export interface FileRouteTypes {
     | '/promos'
     | '/reset-password'
     | '/rewards'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1395,6 +1417,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1455,6 +1478,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rewards'
     | '/spectate'
+    | '/tda-newsletter-unsubscribe'
     | '/terms-of-service'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -1524,6 +1548,7 @@ export interface FileRouteTypes {
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
     | '/api/public/tda-enquiry'
+    | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1585,6 +1610,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RewardsRoute: typeof RewardsRoute
   SpectateRoute: typeof SpectateRouteWithChildren
+  TdaNewsletterUnsubscribeRoute: typeof TdaNewsletterUnsubscribeRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -1613,6 +1639,7 @@ export interface RootRouteChildren {
   ApiPublicMarketingSnapshotRoute: typeof ApiPublicMarketingSnapshotRoute
   ApiPublicOgRoute: typeof ApiPublicOgRoute
   ApiPublicTdaEnquiryRoute: typeof ApiPublicTdaEnquiryRoute
+  ApiPublicTdaNewsletterRoute: typeof ApiPublicTdaNewsletterRoute
   CrewDepartmentDeptIdRoute: typeof CrewDepartmentDeptIdRoute
   CrewLearnCourseIdRoute: typeof CrewLearnCourseIdRoute
   CrewLearnCalendarRoute: typeof CrewLearnCalendarRoute
@@ -1762,6 +1789,13 @@ declare module '@tanstack/react-router' {
       path: '/spectate'
       fullPath: '/spectate'
       preLoaderRoute: typeof SpectateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tda-newsletter-unsubscribe': {
+      id: '/tda-newsletter-unsubscribe'
+      path: '/tda-newsletter-unsubscribe'
+      fullPath: '/tda-newsletter-unsubscribe'
+      preLoaderRoute: typeof TdaNewsletterUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms-of-service': {
@@ -2268,6 +2302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTdaEnquiryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tda-newsletter': {
+      id: '/api/public/tda-newsletter'
+      path: '/api/public/tda-newsletter'
+      fullPath: '/api/public/tda-newsletter'
+      preLoaderRoute: typeof ApiPublicTdaNewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/crew/department/$deptId': {
       id: '/crew/department/$deptId'
       path: '/crew/department/$deptId'
@@ -2705,6 +2746,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RewardsRoute: RewardsRoute,
   SpectateRoute: SpectateRouteWithChildren,
+  TdaNewsletterUnsubscribeRoute: TdaNewsletterUnsubscribeRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
@@ -2735,6 +2777,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMarketingSnapshotRoute: ApiPublicMarketingSnapshotRoute,
   ApiPublicOgRoute: ApiPublicOgRoute,
   ApiPublicTdaEnquiryRoute: ApiPublicTdaEnquiryRoute,
+  ApiPublicTdaNewsletterRoute: ApiPublicTdaNewsletterRoute,
   CrewDepartmentDeptIdRoute: CrewDepartmentDeptIdRoute,
   CrewLearnCourseIdRoute: CrewLearnCourseIdRoute,
   CrewLearnCalendarRoute: CrewLearnCalendarRoute,
