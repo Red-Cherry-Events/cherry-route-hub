@@ -33,7 +33,7 @@
   panel.style.cssText = [
     "display: none",
     "position: fixed",
-    "z-index: 999999",
+    "z-index: 1000000",
     "overflow: hidden",
     "border-radius: 16px",
     "box-shadow: 0 20px 50px rgba(0,0,0,0.25)",
@@ -107,6 +107,17 @@
   }
 
   let open = false;
+
+  function updateLauncher() {
+    // On phones the panel is full screen, so the launcher must not sit over the input.
+    launcher.style.display = open && isSmall() ? "none" : "grid";
+    launcher.setAttribute("aria-expanded", open ? "true" : "false");
+    launcher.setAttribute(
+      "aria-label",
+      open ? "Close Red Cherry assistant" : "Open Red Cherry assistant",
+    );
+  }
+
   function toggle() {
     open = !open;
     panel.style.display = open ? "block" : "none";
@@ -114,11 +125,15 @@
       layout();
       setTimeout(() => iframe.focus(), 0);
     }
+    updateLauncher();
   }
 
   launcher.addEventListener("click", toggle);
 
-  window.addEventListener("resize", layout);
+  window.addEventListener("resize", () => {
+    layout();
+    updateLauncher();
+  });
 
   window.addEventListener("message", (event) => {
     // Trust the chat frame itself; the site may load it from either Rider Hub domain.
@@ -127,10 +142,12 @@
     if (data && typeof data === "object" && data.type === "red-cherry-assistant-close") {
       open = false;
       panel.style.display = "none";
+      updateLauncher();
     }
   });
 
   document.body.appendChild(root);
   document.body.appendChild(launcher);
   layout();
+  updateLauncher();
 })();
