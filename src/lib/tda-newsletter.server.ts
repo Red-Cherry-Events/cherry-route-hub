@@ -4,6 +4,7 @@ import { newsletterSchema, newsletterSubject, emailDue, seriesStopped, type News
 import { isAllowedTdaOrigin, tdaCorsHeaders, TDA_DEFAULT_LIST_IDS } from './tda-enquiry';
 import { syncContactToLists } from './tda-enquiry.server';
 import { everlyticRequest } from './everlytic.server';
+import { sendIndividualNewsletter } from './tda-newsletter-delivery.server';
 
 export async function newsletterCounts(admin: any): Promise<NewsletterCounts> {
   const { data: events, error } = await admin.from('events').select('id,slug,entry_ninja_id,classes,capacity,title_sponsor_logo_url').in('entry_ninja_id', ['84152','84785']);
@@ -88,19 +89,20 @@ export async function sendNewsletterTest(admin:any,email:string,name:string,numb
 }
 
 export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:number}={}) {
-  // A campaign-list send is not a verified one-recipient delivery API.
-  // Never create subscriber-specific lists or reuse admin previews for marketing delivery.
-  // Until that boundary is verified, all subscriber sends remain blocked in code,
-  // even if the database configuration is changed outside the admin screen.
   const {data:pending}=await admin.from('tda_newsletter_signups').select('id').eq('everlytic_synced',false).eq('status','active').limit(10);
   for(const row of pending??[]) await syncNewsletter(admin,row.id);
   const {data:config}=await admin.from('tda_newsletter_campaign').select('*').eq('id',true).maybeSingle();
-  if(!config?.enabled || !config.delivery_verified) return {sent:0,disabled:true};
+  // During verification only Shaun can pass the gate, never the whole audience.
+  const verifying=config?.delivery_verified===false && config?.enabled===false && config?.enabled_at==='2000-01-01T00:00:00+00:00';
+  if((!config?.enabled || !config.delivery_verified) && !verifying) return {sent:0,disabled:true};
   let query=admin.from('tda_newsletter_signups').select('*').eq('status','active').order('consent_at').limit(opts.limit??30);
   if(opts.id) query=query.eq('id',opts.id);
   const {data:rows,error}=await query;
   if(error) throw Error('Could not load sign-ups');
+  let sent=0;
   for(const row of rows??[]) {
+    if(verifying && row.email!=='shaun@redcherryevents.co.za') continue;
+    let claimId:string|undefined;
     try {
       if(await hasTdaEntry(admin,row.email)) {await admin.from('tda_newsletter_signups').update({status:'entered'}).eq('id',row.id);continue;}
       const c=await newsletterCounts(admin);
@@ -108,8 +110,33 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       const start=row.series_started_at??new Date().toISOString();
       if(!row.series_started_at) await admin.from('tda_newsletter_signups').update({series_started_at:start}).eq('id',row.id).eq('generation',row.generation);
       if(!emailDue(start,row.next_email)) continue;
-      // Leave this step pending, never count an unsent message as sent.
-    } catch(e) {await admin.from('tda_newsletter_signups').update({everlytic_error:(e as Error).message.slice(0,300)}).eq('id',row.id);}
+      const {data:claim,error:claimError}=await admin.from('tda_newsletter_sends').insert({signup_id:row.id,generation:row.generation,email_number:row.next_email}).select('id').single();
+      if(claimError||!claim) continue; // Unique claim prevents duplicate or uncertain re-sends.
+      claimId=claim.id;
+      const {data:fresh}=await admin.from('tda_newsletter_signups').select('status,generation').eq('id',row.id).single();
+      if(fresh?.status!=='active'||fresh.generation!==row.generation) {await admin.from('tda_newsletter_sends').update({status:'stopped'}).eq('id',claim.id);continue;}
+      const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
+      if(!u||!k) throw Error('Everlytic is not connected');
+      const raw=await everlyticRequest(`/api/2.0/contacts?filters[email]=${encodeURIComponent(row.email)}&count=25`,'GET',u,k);
+      const contact=(raw.collection??[]).map((r:any)=>r.data??r).find((r:any)=>String(r.email).toLowerCase()===row.email);
+      if(!contact) throw Error('Could not verify Everlytic contact');
+      if(contact.status!=='on'||!['none','on','subscribed','confirmed'].includes(contact.email_status??'')) {
+        await admin.from('tda_newsletter_signups').update({status:'unsubscribed',unsubscribed_at:new Date().toISOString()}).eq('id',row.id);
+        await admin.from('tda_newsletter_sends').update({status:'stopped'}).eq('id',claim.id);continue;
+      }
+      const unsub=`https://riderhub.redcherryevents.co.za/tda-newsletter-unsubscribe?token=${row.unsubscribe_token}`;
+      const html=await renderTdaNewsletter({number:row.next_email,name:row.name,counts:c,unsubscribeUrl:unsub});
+      const delivery=await sendIndividualNewsletter(row.email,row.name??'',newsletterSubject(row.next_email,c),html,`${row.id}:${row.generation}:${row.next_email}`);
+      const {error:saveError}=await admin.from('tda_newsletter_sends').update({status:'accepted',provider_email_id:delivery.messageId}).eq('id',claim.id);
+      if(saveError) throw Error('Everlytic accepted delivery but progress could not be saved');
+      const {error:progressError}=await admin.from('tda_newsletter_signups').update({next_email:row.next_email+1,status:row.next_email===4?'finished':'active',everlytic_error:null}).eq('id',row.id).eq('generation',row.generation).eq('status','active');
+      if(progressError) throw Error('Everlytic accepted delivery but subscriber progress could not be saved');
+      sent++;
+    } catch(e) {
+      const message=(e as Error).message.slice(0,1800);
+      if(claimId) await admin.from('tda_newsletter_sends').update({status:'uncertain',error:message}).eq('id',claimId).eq('status','claimed');
+      await admin.from('tda_newsletter_signups').update({everlytic_error:message}).eq('id',row.id);
+    }
   }
-  return {sent:0,disabled:true,reason:'Individual Everlytic delivery is not verified'};
+  return {sent,disabled:!config?.enabled};
 }
