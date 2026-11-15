@@ -44,6 +44,17 @@ export type EventRoute = {
   kmlUrls?: string[];      // one or more KML files layered on the interactive map
   color?: string;          // optional override for the polyline colour on the map
   customMarkers?: CustomMarker[]; // admin-added markers shown on the interactive map
+  stages?: RouteStage[];   // timed stages (enduro formats); absent = plain route
+};
+
+export type RouteStage = {
+  id: string;
+  number: number;          // 1, 2, 3...
+  name: string;            // e.g. "Peninsula Power Products"
+  sponsor?: string;        // optional, e.g. "Best Bikes"
+  startLat: number; startLng: number;
+  endLat: number; endLng: number;
+  color?: string;          // defaults to the route colour
 };
 
 export type EventDay = {

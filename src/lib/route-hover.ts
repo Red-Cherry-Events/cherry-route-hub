@@ -24,3 +24,19 @@ export function useRouteHover(): RouteHover {
     () => null,
   );
 }
+
+/** Which timed stage the rider picked from the stage list (map zooms to it). */
+export type StageFocus = { routeId: string; stageId: string; n: number } | null;
+let focus: StageFocus = null;
+const focusListeners = new Set<() => void>();
+export function setStageFocus(next: StageFocus) {
+  focus = next;
+  focusListeners.forEach((l) => l());
+}
+export function useStageFocus(): StageFocus {
+  return useSyncExternalStore(
+    (l) => { focusListeners.add(l); return () => focusListeners.delete(l); },
+    () => focus,
+    () => null,
+  );
+}
