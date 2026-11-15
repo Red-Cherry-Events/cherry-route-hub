@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import { locateStages, stageAtKm } from "./route-stages";
 import type { LatLngAlt } from "./geo";
 
@@ -14,23 +15,23 @@ const st = (id: string, number: number, a: number, b: number) => ({
 describe("locateStages", () => {
   it("finds start before end and climbs on the way up", () => {
     const [s] = locateStages(line, [st("s1", 1, 2, 8)]);
-    expect(s.startIdx).toBe(2);
-    expect(s.endIdx).toBe(8);
-    expect(s.lengthKm).toBeCloseTo(0.667, 2);
-    expect(s.climbM).toBe(60);
+    assert.equal(s.startIdx, 2);
+    assert.equal(s.endIdx, 8);
+    assert.ok(Math.abs(s.lengthKm - 0.667) < 0.005);
+    assert.equal(s.climbM, 60);
   });
   it("puts a later stage on the return pass, after the previous stage's end", () => {
     const [, s2] = locateStages(line, [st("s1", 1, 2, 15), st("s2", 2, 10, 4)]);
-    expect(s2.startIdx).toBe(30); // index of point 10 on the way back
-    expect(s2.endIdx).toBe(36);
-    expect(s2.climbM).toBe(0);
+    assert.equal(s2.startIdx, 30); // index of point 10 on the way back
+    assert.equal(s2.endIdx, 36);
+    assert.equal(s2.climbM, 0);
   });
   it("returns nothing for routes without stages", () => {
-    expect(locateStages(line, undefined)).toEqual([]);
+    assert.deepEqual(locateStages(line, undefined), []);
   });
   it("labels km inside a stage", () => {
     const located = locateStages(line, [st("s1", 1, 2, 8)]);
-    expect(stageAtKm(located, 0.5)?.stage.number).toBe(1);
-    expect(stageAtKm(located, 1.5)).toBeNull();
+    assert.equal(stageAtKm(located, 0.5)?.stage.number, 1);
+    assert.equal(stageAtKm(located, 1.5), null);
   });
 });
