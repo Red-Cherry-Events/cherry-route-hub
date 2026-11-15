@@ -40,7 +40,7 @@ export async function handleS2sEnquiry(request: Request): Promise<Response> {
   for (const [template, recipient, replyTo, column] of [['s2s-enquiry-notification', TDA_TEAM_EMAIL, e.email, 'notified'], ['s2s-enquiry-auto-reply', e.email, TDA_TEAM_EMAIL, 'auto_replied']]) {
     try {
       const sent = await sendTemplateEmail(template, recipient, { templateData: data, replyTo, idempotencyKey: `${template}-${row.id}` });
-      if (sent.sent) await supabaseAdmin.from('website_enquiries').update({ [column]: true }).eq('id', row.id);
+      if (sent.sent) await supabaseAdmin.from('website_enquiries').update(column === 'notified' ? { notified: true } : { auto_replied: true }).eq('id', row.id);
     } catch (err) { console.error('s2s-enquiry email failed', template, (err as Error).message); }
   }
   if (shouldRecordNorthInterest(e)) {
