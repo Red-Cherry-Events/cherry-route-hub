@@ -6,7 +6,7 @@ export const manageTdaNewsletter=createServerFn({method:'POST'}).middleware([req
   if(error||!role) throw Error('Admins only');
   const {supabaseAdmin:admin}=await import('@/integrations/supabase/client.server');
   const {newsletterPreview,sendNewsletterTest,syncNewsletter}=await import('./tda-newsletter.server');
-  if(data.action==='toggle') {const {error}=await admin.rpc('set_tda_newsletter_enabled',{_enabled:data.enabled===true});if(error) throw Error('Email delivery must be verified before the series can be enabled.');return {ok:true};}
+  if(data.action==='toggle') {if(data.enabled) throw Error('Individual Everlytic delivery still needs verification. The series cannot be enabled yet.');const {error}=await admin.rpc('set_tda_newsletter_enabled',{_enabled:false});if(error) throw Error('Could not save the switch.');return {ok:true};}
   if(data.action==='retry') {if(!data.id) throw Error('Choose a sign-up');return {ok:await syncNewsletter(admin,data.id)};}
   if(data.action==='preview'||data.action==='test') {
     if(!data.number) throw Error('Choose an email');

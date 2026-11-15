@@ -30,8 +30,8 @@ export async function hasTdaEntry(admin: any, email: string) {
   return (data ?? []).some((r: any) => String(r.entrants?.email ?? '').trim().toLowerCase() === email.trim().toLowerCase());
 }
 export async function syncNewsletter(admin: any, id: string) {
-  const { data: row } = await admin.from('tda_newsletter_signups').select('email').eq('id',id).single();
-  if(!row) return false;
+  const { data: row } = await admin.from('tda_newsletter_signups').select('email,status').eq('id',id).single();
+  if(!row || row.status==='unsubscribed') return false;
   try {
     const u = process.env['EVERLYTIC_USERNAME'], k = process.env['EVERLYTIC_API_KEY'];
     if(!u || !k) throw Error('Everlytic is not connected');
