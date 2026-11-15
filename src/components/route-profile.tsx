@@ -16,6 +16,10 @@ import type { CustomMarker, EventRoute } from "@/lib/mock-data";
 import { PRECOMPUTED_ROUTE_ELEVATIONS } from "@/lib/precomputed-route-elevations";
 import { setRouteHover } from "@/lib/route-hover";
 import { getRouteElevation } from "@/lib/elevation.functions";
+import { climbOf, locateStages, stageAtKm } from "@/lib/route-stages";
+import { setStageFocus } from "@/lib/route-hover";
+
+type StageBand = { id: string; number: number; name: string; sponsor?: string; color?: string; startKm: number; endKm: number; lengthKm: number; climbM: number | null };
 
 type Point = { km: number; ele: number; lat: number; lng: number };
 type Pin = { id: string; name: string; km: number; color?: string; logoUrl?: string; icon?: CustomMarker["icon"] };
@@ -112,6 +116,8 @@ export function RouteProfile({
   const [pins, setPins] = useState<Pin[]>([]);
   const [failed, setFailed] = useState(false);
   const [hover, setHover] = useState<number | null>(null);
+  const [stageBands, setStageBands] = useState<StageBand[]>([]);
+  const [focusStage, setFocusStage] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   // Chart is drawn at the real on-screen width so it stretches across wide
   // screens without growing taller or blowing up its text.
@@ -151,6 +157,19 @@ export function RouteProfile({
         return;
       }
       const km = cumulativeKm(merged);
+      const located = locateStages(merged, route.stages);
+      const bands: StageBand[] = located.map((l) => ({
+        id: l.stage.id, number: l.stage.number, name: l.stage.name, sponsor: l.stage.sponsor, color: l.stage.color,
+        startKm: l.startKm, endKm: l.endKm, lengthKm: l.lengthKm, climbM: l.climbM,
+      }));
+      const finishBands = (pts: Point[]) =>
+        setStageBands(
+          bands.map((b) => {
+            if (b.climbM !== null) return b;
+            const inside = pts.filter((p) => p.km >= b.startKm && p.km <= b.endKm);
+            return { ...b, climbM: climbOf(inside.map((p) => p.ele), inside.map((p) => p.km)) };
+          }),
+        );
       // Project each admin marker (water points, sponsor stops) onto the route
       // so it can be shown at its true distance on the profile.
       const own = route.customMarkers ?? [];
@@ -189,6 +208,7 @@ export function RouteProfile({
             full.push({ km: km[i], ele, lat: merged[i][1], lng: merged[i][0] });
         }
         setGain(totalGain(full));
+        finishBands(full);
         setSeries(forDisplay(full));
         return;
       }
@@ -218,13 +238,14 @@ export function RouteProfile({
         lng: merged[i][0],
       }));
       setGain(totalGain(pts));
+      finishBands(pts);
       setSeries(pts);
     })();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kmls.join("|"), (markers ?? []).map((m) => m.id).join("|"), fetchElevation]);
+  }, [kmls.join("|"), (markers ?? []).map((m) => m.id).join("|"), JSON.stringify(route.stages ?? null), fetchElevation]);
 
 
   const chart = useMemo(() => {
@@ -258,6 +279,26 @@ export function RouteProfile({
   const stroke = color || route.color || "#b91c1c";
   const climbM = gain ?? totalGain(series);
   const hoverPoint = hover !== null ? series[hover] : null;
+  const hoverStage = hoverPoint && stageBands.length ? stageAtKm(stageBands, hoverPoint.km) : null;
+  const readout = hoverPoint
+    ? `${stageBands.length ? (hoverStage ? `Stage ${hoverStage.number} · ` : "Liaison · ") : ""}${hoverPoint.km.toFixed(1)} km · ${Math.round(hoverPoint.ele)} m`
+    : null;
+  const badgeSize = boxW < 640 ? 18 : 22;
+  // Stage badges never overlap: nudge each one right of the previous.
+  const badgeLeft: number[] = [];
+  for (const b of stageBands) {
+    const want = (chart.x(b.startKm) / chart.W) * boxW;
+    const prev = badgeLeft[badgeLeft.length - 1];
+    badgeLeft.push(prev === undefined ? want : Math.max(want, prev + badgeSize + 2));
+  }
+  const stagePath = (b: StageBand) => {
+    const pts = series.filter((p) => p.km >= b.startKm && p.km <= b.endKm);
+    return pts.map((p, i) => `${i === 0 ? "M" : "L"}${chart.x(p.km).toFixed(1)},${chart.y(p.ele).toFixed(1)}`).join(" ");
+  };
+  const pickStage = (b: StageBand) => {
+    setFocusStage(b.id);
+    setStageFocus({ routeId: route.id, stageId: b.id, n: Date.now() });
+  };
 
   const onMove = (clientX: number) => {
     const svg = svgRef.current;
@@ -309,8 +350,18 @@ export function RouteProfile({
       </div>
 
       <div className="relative" ref={boxRef}>
-      {pins.length > 0 ? (
+      {pins.length > 0 || stageBands.length > 0 ? (
         <div className="pointer-events-none relative mt-2 h-7">
+          {stageBands.map((b, i) => (
+            <div
+              key={`sb-${b.id}`}
+              className="absolute top-0.5 grid place-items-center rounded-full font-extrabold text-ink shadow-sm ring-2 ring-white"
+              style={{ left: badgeLeft[i], width: badgeSize, height: badgeSize, marginLeft: -badgeSize / 2, fontSize: badgeSize * 0.55, background: b.color || stroke, outline: "1px solid rgba(0,0,0,.55)" }}
+              title={`Stage ${b.number} · ${b.name}`}
+            >
+              {b.number}
+            </div>
+          ))}
           {pins.map((p) => (
             <div
               key={`pb-${p.id}`}
@@ -378,8 +429,22 @@ export function RouteProfile({
           );
         })}
 
+        {stageBands.map((b) => (
+          <rect
+            key={`band-${b.id}`}
+            x={chart.x(b.startKm)}
+            y={chart.pad.t}
+            width={Math.max(1, chart.x(b.endKm) - chart.x(b.startKm))}
+            height={chart.H - chart.pad.t - chart.pad.b}
+            fill={b.color || stroke}
+            fillOpacity={focusStage === b.id ? 0.4 : 0.22}
+          />
+        ))}
         <path d={chart.area} fill={`url(#rp-${route.id})`} />
         <path d={chart.line} fill="none" stroke={stroke} strokeWidth="2.5" strokeLinejoin="round" />
+        {stageBands.map((b) => (
+          <path key={`sl-${b.id}`} d={stagePath(b)} fill="none" stroke={b.color || stroke} strokeWidth={focusStage === b.id ? 6 : 5} strokeLinejoin="round" strokeLinecap="round" />
+        ))}
 
         {[0, 0.25, 0.5, 0.75, 1].map((f) => (
           <text
@@ -424,15 +489,52 @@ export function RouteProfile({
         ) : null}
       </svg>
       <p className={`mt-1 text-center text-[10px] font-medium ${pePlett ? "text-pe-plett-foreground/60" : "text-ink-soft"}`}>
-        {hoverPoint ? `${hoverPoint.km.toFixed(1)} km · ${Math.round(hoverPoint.ele)} m` : "Slide your finger along the chart to follow the route on the map"}
+        {readout ?? "Slide your finger along the chart to follow the route on the map"}
       </p>
       </div>
 
       <p className={`mt-1 text-[11px] font-semibold ${pePlett ? "text-pe-plett-foreground/80" : "text-ink"}`}>
-        {hoverPoint
-          ? `${hoverPoint.km.toFixed(1)} km · ${Math.round(hoverPoint.ele)} m`
-          : "Hover or drag across the profile to read distance and altitude"}
+        {readout ?? "Hover or drag across the profile to read distance and altitude"}
       </p>
+
+      {stageBands.length > 0 ? (
+        <div className="mt-3">
+          <p className={`text-[10px] ${pePlett ? "text-pe-plett-foreground/60" : "text-ink-soft"}`}>
+            Thick coloured line = timed stage · thin line = liaison (untimed, follow the GPS)
+          </p>
+          <ul className={`mt-1.5 divide-y ${pePlett ? "divide-pe-plett-foreground/10" : "divide-border"}`}>
+            {stageBands.map((b) => (
+              <li key={`row-${b.id}`}>
+                <button
+                  type="button"
+                  onClick={() => pickStage(b)}
+                  aria-pressed={focusStage === b.id}
+                  className={`flex w-full items-center gap-2.5 rounded-md px-1 py-2 text-left ${focusStage === b.id ? (pePlett ? "bg-pe-plett-foreground/10" : "bg-secondary") : ""}`}
+                >
+                  <span
+                    className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-extrabold text-ink ring-2 ring-white"
+                    style={{ background: b.color || stroke, outline: "1px solid rgba(0,0,0,.55)" }}
+                  >
+                    {b.number}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate text-xs font-semibold ${pePlett ? "text-pe-plett-foreground" : "text-ink"}`}>
+                      Stage {b.number} · {b.name}{b.sponsor ? ` · powered by ${b.sponsor}` : ""}
+                    </span>
+                    <span className={`block text-[11px] ${pePlett ? "text-pe-plett-foreground/60" : "text-ink-soft"}`}>
+                      km {b.startKm.toFixed(1)} → {b.endKm.toFixed(1)}
+                    </span>
+                  </span>
+                  <span className={`shrink-0 text-right text-[11px] font-semibold ${pePlett ? "text-pe-plett-foreground" : "text-ink"}`}>
+                    {b.lengthKm.toFixed(1)} km
+                    {b.climbM !== null ? <span className="block font-normal opacity-70">{b.climbM} m up</span> : null}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

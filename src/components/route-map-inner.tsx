@@ -28,7 +28,8 @@ import {
 } from "@/lib/geo";
 import { getRouteElevation } from "@/lib/elevation.functions";
 import { withRegistrationDayLabels } from "@/lib/event-days";
-import { useRouteHover } from "@/lib/route-hover";
+import { useRouteHover, useStageFocus } from "@/lib/route-hover";
+import { addStageLayers } from "@/lib/route-stage-layers";
 import RouteMapTrackpad from "@/components/route-map-trackpad";
 import { navigationProgress } from '@/lib/fullscreen-navigation';
 // This module is lazy-loaded in the browser; rotation never enters SSR.
@@ -216,6 +217,26 @@ function HoverMarker() {
 function DirectionArrows({ lines }: { lines: { color: string; lines: LatLngAlt[][] }[] }) {
   const map = useMap();
   useEffect(() => addDirectionArrows(map, lines), [lines, map]);
+  return null;
+}
+
+/** Timed stages drawn over a route; also zooms to a stage picked in the list. */
+function StageOverlay({ route, lines, color }: { route: EventRoute; lines: LatLngAlt[][]; color: string }) {
+  const map = useMap();
+  const focus = useStageFocus();
+  const locatedRef = useRef<ReturnType<typeof addStageLayers>["located"]>([]);
+  useEffect(() => {
+    const added = addStageLayers(map, lines, route.stages, color);
+    locatedRef.current = added.located;
+    return added.remove;
+  }, [map, lines, route.stages, color]);
+  useEffect(() => {
+    if (!focus || focus.routeId !== route.id) return;
+    const s = locatedRef.current.find((x) => x.stage.id === focus.stageId);
+    if (s && s.coords.length > 1) {
+      map.fitBounds(L.latLngBounds(s.coords.map(([lng, lat]) => [lat, lng] as [number, number])), { padding: [32, 32], animate: true });
+    }
+  }, [focus, map, route.id]);
   return null;
 }
 
@@ -627,6 +648,11 @@ export default function RouteMapInner({
             pathOptions={{ color: l.color, weight: 5, opacity: 0.9 }}
           />
         )),
+      )}
+      {visible.map((l) =>
+        l.route.stages?.length ? (
+          <StageOverlay key={`${l.route.id}-stages`} route={l.route} lines={l.navigationLines} color={l.color} />
+        ) : null,
       )}
       {shownMarkers.map(({ owner: l, marker: m }) => {
         const color = m.color || l.color;
