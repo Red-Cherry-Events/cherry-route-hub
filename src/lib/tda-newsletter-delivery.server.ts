@@ -1,5 +1,12 @@
 import { everlyticRequest } from './everlytic.server';
 
+export function newsletterContactState(payload:any,email:string) {
+  const contacts=(payload.collection??[]).map((r:any)=>r.data??r).filter((r:any)=>String(r.email).trim().toLowerCase()===email.trim().toLowerCase());
+  if(!contacts.length) return 'missing';
+  if(contacts.some((c:any)=>['unsubscribed','off'].includes(c.email_status)||c.status==='off')) return 'unsubscribed';
+  return contacts.some((c:any)=>c.status==='on'&&['none','on','subscribed','confirmed'].includes(c.email_status??''))?'active':'suppressed';
+}
+
 export function transactionalRequest(email:string,name:string,subject:string,html:string,key:string) {
   return { headers: { to: { [email]: name || email }, from: { 'Team@redcherryevents.co.za': 'M&G Investments Tour de Addo' }, reply_to: { 'team@redcherryevents.co.za': 'Red Cherry Events' }, subject, 'trans-group-name': 'Tour de Addo newsletter', 'trans-series-key': key }, body: { html }, attachments: [], options: { track_opens: 'yes', track_links: 'yes', batch_send: 'no' } };
 }

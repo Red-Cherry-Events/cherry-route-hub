@@ -4,7 +4,7 @@ import { newsletterSchema, newsletterSubject, emailDue, seriesStopped, type News
 import { isAllowedTdaOrigin, tdaCorsHeaders, TDA_DEFAULT_LIST_IDS } from './tda-enquiry';
 import { syncContactToLists } from './tda-enquiry.server';
 import { everlyticRequest } from './everlytic.server';
-import { sendIndividualNewsletter } from './tda-newsletter-delivery.server';
+import { sendIndividualNewsletter, newsletterContactState } from './tda-newsletter-delivery.server';
 
 export async function newsletterCounts(admin: any): Promise<NewsletterCounts> {
   const { data: events, error } = await admin.from('events').select('id,slug,entry_ninja_id,classes,capacity,title_sponsor_logo_url').in('entry_ninja_id', ['84152','84785']);
@@ -118,9 +118,9 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
       if(!u||!k) throw Error('Everlytic is not connected');
       const raw=await everlyticRequest(`/api/2.0/contacts?filters[email]=${encodeURIComponent(row.email)}&count=25`,'GET',u,k);
-      const contact=(raw.collection??[]).map((r:any)=>r.data??r).find((r:any)=>String(r.email).toLowerCase()===row.email);
-      if(!contact) throw Error('Could not verify Everlytic contact');
-      if(contact.status!=='on'||!['none','on','subscribed','confirmed'].includes(contact.email_status??'')) {
+      const state=newsletterContactState(raw,row.email);
+      if(state==='missing'||state==='suppressed') throw Error(`Everlytic contact is ${state}. No message sent.`);
+      if(state==='unsubscribed') {
         await admin.from('tda_newsletter_signups').update({status:'unsubscribed',unsubscribed_at:new Date().toISOString()}).eq('id',row.id);
         await admin.from('tda_newsletter_sends').update({status:'stopped'}).eq('id',claim.id);continue;
       }
