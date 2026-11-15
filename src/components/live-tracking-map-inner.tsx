@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import type { CustomMarker } from "@/lib/mock-data";
 import { RouteProfile } from "@/components/route-profile";
 import { addStageLayers } from "@/lib/route-stage-layers";
+import { locateStages } from "@/lib/route-stages";
+import { useStageFocus } from "@/lib/route-hover";
 import { useRouteHover } from "@/lib/route-hover";
 import {
   fetchTeamLocationsCrew,
@@ -948,6 +950,19 @@ export default function LiveTrackingMapInner({
       routeLayersRef.current.clear();
     };
   }, [matchedRoutes, fullscreen]);
+
+  // Zoom to a timed stage picked from the stage list under the profile.
+  const stageFocus = useStageFocus();
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !stageFocus) return;
+    const c = matchedRoutes.find((r) => r.route.id === stageFocus.routeId);
+    if (!c) return;
+    const s = locateStages((navigationLinesRef.current.get(c.route.id) ?? c.lines).flat(), c.route.stages).find(
+      (x) => x.stage.id === stageFocus.stageId,
+    );
+    if (s && s.coords.length > 1) map.fitBounds(L.latLngBounds(s.coords.map(([lng, lat]) => [lat, lng] as [number, number])), { padding: [32, 32] });
+  }, [stageFocus, matchedRoutes]);
 
   // Course line used for progress + off-course checks: the followed rider's route.
   const course: CourseLine | null = useMemo(() => {
