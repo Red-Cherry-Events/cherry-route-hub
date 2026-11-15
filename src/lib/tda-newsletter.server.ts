@@ -92,16 +92,14 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
   const {data:pending}=await admin.from('tda_newsletter_signups').select('id').eq('everlytic_synced',false).eq('status','active').limit(10);
   for(const row of pending??[]) await syncNewsletter(admin,row.id);
   const {data:config}=await admin.from('tda_newsletter_campaign').select('*').eq('id',true).maybeSingle();
-  // During verification only Shaun can pass the gate, never the whole audience.
-  const verifying=config?.delivery_verified===false && config?.enabled===false && config?.enabled_at==='2000-01-01T00:00:00+00:00';
-  if((!config?.enabled || !config.delivery_verified) && !verifying) return {sent:0,disabled:true};
-  let query=admin.from('tda_newsletter_signups').select('*').eq('status','active').order('consent_at').limit(opts.limit??30);
+  if(!config?.enabled || !config.delivery_verified) return {sent:0,disabled:true};
+  let query=admin.from('tda_newsletter_signups').select('*').eq('status','active').order('consent_at').limit(10000);
   if(opts.id) query=query.eq('id',opts.id);
   const {data:rows,error}=await query;
   if(error) throw Error('Could not load sign-ups');
   let sent=0;
   for(const row of rows??[]) {
-    if(verifying && row.email!=='shaun@redcherryevents.co.za') continue;
+    if(sent>=(opts.limit??30)) break;
     let claimId:string|undefined;
     try {
       if(await hasTdaEntry(admin,row.email)) {await admin.from('tda_newsletter_signups').update({status:'entered'}).eq('id',row.id);continue;}
