@@ -116,7 +116,15 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       const u=process.env['EVERLYTIC_USERNAME'],k=process.env['EVERLYTIC_API_KEY'];
       if(!u||!k) throw Error('Everlytic is not connected');
       const raw=await everlyticRequest(`/api/2.0/contacts?filters[email]=${encodeURIComponent(row.email)}&count=25`,'GET',u,k);
-      const state=newsletterContactState(raw,row.email);
+      let state=newsletterContactState(raw,row.email);
+      const {data:previous,error:previousError}=await admin.from('tda_newsletter_sends').select('provider_list_id').eq('signup_id',row.id).eq('generation',row.generation).eq('status','accepted');
+      if(previousError) throw Error('Could not check prior delivery preferences');
+      for(const prior of previous??[]) {
+        if(!prior.provider_list_id) continue;
+        const preferences=await everlyticRequest(`/api/2.0/list_subscriptions/${prior.provider_list_id}?count=2`,'GET',u,k);
+        const mappings=(preferences.collection??[]).map((r:any)=>r.data??r);
+        if(mappings.some((r:any)=>['unsubscribed','off'].includes(r.email_status))) state='unsubscribed';
+      }
       if(state==='missing'||state==='suppressed') throw Error(`Everlytic contact is ${state}. No message sent.`);
       if(state==='unsubscribed') {
         await admin.from('tda_newsletter_signups').update({status:'unsubscribed',unsubscribed_at:new Date().toISOString()}).eq('id',row.id);
