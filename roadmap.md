@@ -15,7 +15,7 @@
 - [x] Add Comms previews, signed-in admin tests and subscriber progress
 - [x] Verify local endpoint, admin flow, re-consent and 22 rules tests; request publication without subscriber sends
 - [ ] Connect verified one-recipient Everlytic marketing delivery and enable the usable switch, blocked by unverified provider delivery API; subscriber sends are code-blocked
-- [ ] Confirm deployment and production CORS, endpoint still returned 404 during deployment check
+- [x] Confirm deployment, production CORS for all three origins and live bad-email response
 - [ ] Verify email photography after the separate website deploy; supplied URLs currently show broken images as expected
 
 ## Grabouw bot correction (Shaun, 14 Nov)
