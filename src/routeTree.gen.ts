@@ -98,6 +98,7 @@ import { Route as ApiPublicEventInterestRouteImport } from './routes/api/public/
 import { Route as ApiPublicEventInterestUnsubscribeRouteImport } from './routes/api/public/event-interest-unsubscribe'
 import { Route as ApiPublicMarketingSnapshotRouteImport } from './routes/api/public/marketing-snapshot'
 import { Route as ApiPublicOgRouteImport } from './routes/api/public/og'
+import { Route as ApiPublicS2sEnquiryRouteImport } from './routes/api/public/s2s-enquiry'
 import { Route as ApiPublicTdaEnquiryRouteImport } from './routes/api/public/tda-enquiry'
 import { Route as ApiPublicTdaNewsletterRouteImport } from './routes/api/public/tda-newsletter'
 import { Route as CrewDepartmentDeptIdRouteImport } from './routes/crew.department.$deptId'
@@ -592,6 +593,11 @@ const ApiPublicOgRoute = ApiPublicOgRouteImport.update({
   path: '/api/public/og',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicS2sEnquiryRoute = ApiPublicS2sEnquiryRouteImport.update({
+  id: '/api/public/s2s-enquiry',
+  path: '/api/public/s2s-enquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTdaEnquiryRoute = ApiPublicTdaEnquiryRouteImport.update({
   id: '/api/public/tda-enquiry',
   path: '/api/public/tda-enquiry',
@@ -904,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/api/public/event-interest-unsubscribe': typeof ApiPublicEventInterestUnsubscribeRoute
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
+  '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
@@ -1032,6 +1039,7 @@ export interface FileRoutesByTo {
   '/api/public/event-interest-unsubscribe': typeof ApiPublicEventInterestUnsubscribeRoute
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
+  '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
@@ -1165,6 +1173,7 @@ export interface FileRoutesById {
   '/api/public/event-interest-unsubscribe': typeof ApiPublicEventInterestUnsubscribeRoute
   '/api/public/marketing-snapshot': typeof ApiPublicMarketingSnapshotRoute
   '/api/public/og': typeof ApiPublicOgRoute
+  '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
@@ -1299,6 +1308,7 @@ export interface FileRouteTypes {
     | '/api/public/event-interest-unsubscribe'
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
+    | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
@@ -1427,6 +1437,7 @@ export interface FileRouteTypes {
     | '/api/public/event-interest-unsubscribe'
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
+    | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
@@ -1559,6 +1570,7 @@ export interface FileRouteTypes {
     | '/api/public/event-interest-unsubscribe'
     | '/api/public/marketing-snapshot'
     | '/api/public/og'
+    | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
     | '/crew/department/$deptId'
@@ -1650,6 +1662,7 @@ export interface RootRouteChildren {
   ApiPublicEventInterestUnsubscribeRoute: typeof ApiPublicEventInterestUnsubscribeRoute
   ApiPublicMarketingSnapshotRoute: typeof ApiPublicMarketingSnapshotRoute
   ApiPublicOgRoute: typeof ApiPublicOgRoute
+  ApiPublicS2sEnquiryRoute: typeof ApiPublicS2sEnquiryRoute
   ApiPublicTdaEnquiryRoute: typeof ApiPublicTdaEnquiryRoute
   ApiPublicTdaNewsletterRoute: typeof ApiPublicTdaNewsletterRoute
   CrewDepartmentDeptIdRoute: typeof CrewDepartmentDeptIdRoute
@@ -2314,6 +2327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/s2s-enquiry': {
+      id: '/api/public/s2s-enquiry'
+      path: '/api/public/s2s-enquiry'
+      fullPath: '/api/public/s2s-enquiry'
+      preLoaderRoute: typeof ApiPublicS2sEnquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/tda-enquiry': {
       id: '/api/public/tda-enquiry'
       path: '/api/public/tda-enquiry'
@@ -2797,6 +2817,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicEventInterestUnsubscribeRoute,
   ApiPublicMarketingSnapshotRoute: ApiPublicMarketingSnapshotRoute,
   ApiPublicOgRoute: ApiPublicOgRoute,
+  ApiPublicS2sEnquiryRoute: ApiPublicS2sEnquiryRoute,
   ApiPublicTdaEnquiryRoute: ApiPublicTdaEnquiryRoute,
   ApiPublicTdaNewsletterRoute: ApiPublicTdaNewsletterRoute,
   CrewDepartmentDeptIdRoute: CrewDepartmentDeptIdRoute,
