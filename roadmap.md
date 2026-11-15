@@ -9,6 +9,12 @@
 
 # Roadmap
 
+## Tour de Addo newsletter (Shaun, 15 Nov)
+- [ ] Build stored browser sign-ups, consent/deduplication and opt-out-preserving Everlytic sync
+- [ ] Build four reviewable marketing emails with live counts and entered/unsubscribe stop checks, initially OFF
+- [ ] Add Comms previews, signed-in admin tests, subscriber progress and on/off switch
+- [ ] Verify endpoint, admin flow and rules; publish without sending to subscribers
+
 ## Grabouw bot correction (Shaun, 14 Nov)
 - [x] Save the confirmed Otto1890 Weekend Warrior Grabouw / Oak Valley dates, 2–4 April 2027
 - [x] Make the answer available across events and email Quinn the confirmed dates using the existing app-email sender
