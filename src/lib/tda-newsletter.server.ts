@@ -126,7 +126,13 @@ export async function processTdaNewsletter(admin:any,opts:{id?:string;limit?:num
       }
       const unsub=`https://riderhub.redcherryevents.co.za/tda-newsletter-unsubscribe?token=${row.unsubscribe_token}`;
       const html=await renderTdaNewsletter({number:row.next_email,name:row.name,counts:c,unsubscribeUrl:unsub});
-      const delivery=await sendIndividualNewsletter(row.email,row.name??'',newsletterSubject(row.next_email,c),html,`${row.id}:${row.generation}:${row.next_email}`);
+      const delivery=await sendIndividualNewsletter(row.email,row.name??'',newsletterSubject(row.next_email,c),html,`${row.id}:${row.generation}:${row.next_email}`,async(listId,messageId)=>{
+        const {error}=await admin.from('tda_newsletter_sends').update({provider_list_id:listId,provider_email_id:messageId}).eq('id',claim.id);
+        if(error) throw Error('Could not save prepared delivery. No send attempted.');
+      },async()=>{
+        const {data:latest}=await admin.from('tda_newsletter_signups').select('status,generation').eq('id',row.id).single();
+        return latest?.status==='active'&&latest.generation===row.generation&&!(await hasTdaEntry(admin,row.email))&&!seriesStopped(await newsletterCounts(admin));
+      });
       const {error:saveError}=await admin.from('tda_newsletter_sends').update({status:'accepted',provider_email_id:delivery.messageId}).eq('id',claim.id);
       if(saveError) throw Error('Everlytic accepted delivery but progress could not be saved');
       const {error:progressError}=await admin.from('tda_newsletter_signups').update({next_email:row.next_email+1,status:row.next_email===4?'finished':'active',everlytic_error:null}).eq('id',row.id).eq('generation',row.generation).eq('status','active');
