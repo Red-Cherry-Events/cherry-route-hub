@@ -30,6 +30,11 @@ export const retryEnquiryEverlytic = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertAdmin(context as any);
+    const { data: row } = await context.supabase.from('website_enquiries').select('event_key').eq('id', data.id).maybeSingle();
+    if (row?.event_key === 'sea-to-sea') {
+      const { syncS2sEnquiryToEverlytic } = await import('./s2s-enquiry.server');
+      return syncS2sEnquiryToEverlytic(data.id);
+    }
     const { syncEnquiryToEverlytic } = await import("./tda-enquiry.server");
     return syncEnquiryToEverlytic(data.id);
   });

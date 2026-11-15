@@ -8,7 +8,7 @@ import { csvCell } from "@/lib/security-rules";
 import { listWebsiteEnquiries, retryEnquiryEverlytic } from "@/lib/website-enquiries.functions";
 
 export const Route = createFileRoute("/admin/website-enquiries")({
-  head: () => ({ meta: [{ title: "Website enquiries · Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Website enquiries · Red Cherry Events Admin" }, { name: "description", content: "Review Tour de Addo and JBFE Sea to Sea website enquiries." }, { property: "og:title", content: "Website enquiries · Red Cherry Events Admin" }, { property: "og:description", content: "Review website enquiries." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: WebsiteEnquiries,
 });
 
@@ -22,12 +22,12 @@ function WebsiteEnquiries() {
   const rows = (q.data?.enquiries ?? []) as any[];
 
   const downloadCsv = () => {
-    const header = ["received", "name", "email", "phone", "trip", "question", "consent", "everlytic_synced", "team_notified", "auto_replied"];
-    const lines = rows.map((r) => [r.created_at, r.name, r.email, r.phone, r.trip, r.message, r.consent ? "yes" : "no", r.everlytic_synced ? "yes" : "no", r.notified ? "yes" : "no", r.auto_replied ? "yes" : "no"].map(csvCell).join(","));
+    const header = ["received", "website", "name", "email", "phone", "trip", "question", "consent", "everlytic_synced", "team_notified", "auto_replied"];
+    const lines = rows.map((r) => [r.created_at, r.event_key === 'sea-to-sea' ? 'Sea to Sea' : 'Tour de Addo', r.name, r.email, r.phone, r.trip, r.message, r.consent ? "yes" : "no", r.everlytic_synced ? "yes" : "no", r.notified ? "yes" : "no", r.auto_replied ? "yes" : "no"].map(csvCell).join(","));
     const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "tour-de-addo-website-enquiries.csv";
+    a.download = "website-enquiries.csv";
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -49,7 +49,7 @@ function WebsiteEnquiries() {
     <div className="space-y-4">
       <div>
         <h1 className="font-display text-2xl font-bold text-ink">Website enquiries</h1>
-        <p className="text-sm text-ink-soft">Questions from the Tour de Addo website contact form, newest first.</p>
+        <p className="text-sm text-ink-soft">Tour de Addo and JBFE Sea to Sea enquiries, newest first.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold">
@@ -71,7 +71,7 @@ function WebsiteEnquiries() {
                 <p className="font-semibold text-ink">{r.name} <a className="text-sm font-normal text-primary underline" href={`mailto:${r.email}`}>{r.email}</a></p>
                 <p className="text-xs text-ink-soft">{new Date(r.created_at).toLocaleString("en-ZA")}</p>
               </div>
-              <p className="text-xs text-ink-soft">{r.trip}{r.phone ? ` · ${r.phone}` : ""}</p>
+              <p className="text-xs text-ink-soft">{r.event_key === 'sea-to-sea' ? 'Sea to Sea' : 'Tour de Addo'} · {r.trip}{r.phone ? ` · ${r.phone}` : ""}</p>
               <p className="whitespace-pre-wrap text-sm text-ink">{r.message}</p>
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
                 <span className="rounded-full bg-secondary px-2 py-0.5">{r.notified ? "Team emailed" : "Team email failed"}</span>

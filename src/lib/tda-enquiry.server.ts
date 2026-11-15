@@ -1,11 +1,7 @@
 import { everlyticRequest } from "./everlytic.server";
 import { mayAddMembership } from "./entry-interest-audience";
 import { isAllowedTdaOrigin, parseTdaEnquiry, shouldSyncToEverlytic, tdaCorsHeaders, tdaListIds, TDA_TEAM_EMAIL } from "./tda-enquiry";
-
-async function sha(value: string) {
-  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join("");
-}
+import { readEnquiryFields, consumeEnquiryQuota } from "./website-enquiry-request.server";
 
 /** Adds one contact to each list where it is missing. Never changes existing memberships or opt-outs. */
 export async function syncContactToLists(email: string, lists: string[], username: string, apiKey: string) {
@@ -54,18 +50,6 @@ export async function syncEnquiryToEverlytic(id: string) {
   }
 }
 
-async function readFields(request: Request): Promise<Record<string, unknown>> {
-  const type = request.headers.get("content-type") ?? "";
-  if (type.includes("application/json")) {
-    const body = await request.json().catch(() => ({}));
-    return body && typeof body === "object" ? (body as Record<string, unknown>) : {};
-  }
-  const form = await request.formData();
-  const out: Record<string, unknown> = {};
-  form.forEach((v, k) => { if (typeof v === "string") out[k] = v; });
-  return out;
-}
-
 export async function handleTdaEnquiry(request: Request): Promise<Response> {
   const origin = request.headers.get("origin");
   const cors = tdaCorsHeaders(origin);
@@ -73,7 +57,7 @@ export async function handleTdaEnquiry(request: Request): Promise<Response> {
   if (!isAllowedTdaOrigin(origin)) return json({ ok: false, error: "This form only accepts enquiries from tourdeaddo.com." }, 403);
 
   let fields: Record<string, unknown>;
-  try { fields = await readFields(request); } catch { return json({ ok: false, error: "Please check the form and try again." }, 400); }
+  try { fields = await readEnquiryFields(request); } catch { return json({ ok: false, error: "Please check the form and try again." }, 400); }
   const parsed = parseTdaEnquiry(fields);
   if (parsed.kind === "honeypot") return json({ ok: true });
   if (parsed.kind === "invalid") return json({ ok: false, error: parsed.error }, 400);
@@ -81,8 +65,7 @@ export async function handleTdaEnquiry(request: Request): Promise<Response> {
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const quota = async (scope: string, actor: string, limit: number, seconds: number) => {
-    const { data, error } = await supabaseAdmin.rpc("consume_request_quota", { _scope: scope, _actor_hash: await sha(actor), _limit: limit, _window_seconds: seconds });
-    return !error && data === true;
+    return consumeEnquiryQuota(supabaseAdmin, scope, actor, limit, seconds);
   };
   if (!(await quota("tda-enquiry-all", "all", 20, 60)) || !(await quota("tda-enquiry-email", e.email, 5, 3600))) {
     return json({ ok: false, error: "We've received a lot of messages. Please try again in a little while or call (041) 581 5335." }, 429);
