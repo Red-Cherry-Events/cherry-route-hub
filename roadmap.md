@@ -14,7 +14,7 @@
 - [x] Build the mailer from the shared Otto1890 email module, solid PNG/JPG images only
 - [x] Create Everlytic draft 926722 with no audience attached, one test sent to Shaun only
 - [x] Count proposed audience: 1,619 unique subscribed contacts across 13 lists, campaign 923637 untouched
-- [ ] Attach audience, set A/B subjects and arm for Tue 17 Nov 09:00 SAST (waiting on Shaun's approval)
+- [x] Swap hero to drone shot, attach 13 approved lists, preheader set, scheduled Tue 17 Nov 09:00 SAST (main subject only, no A/B)
 
 ## JBFE Sea to Sea website enquiries (Shaun, 15 Nov)
 - [x] Add validated public enquiry endpoint, stored admin rows and action-triggered emails
