@@ -42,8 +42,9 @@ export function WeekendWarriorSuperSport({ greetingName = '{{contact.contact_nam
         <Section style={{ margin: '0 0 24px' }}>
           <Button href={SUPERSPORT_REMINDER_URL} style={{ ...ww.button, display: 'block', textAlign: 'center' }}>Set my entry reminder</Button>
         </Section>
+        <Text style={{ ...ww.text, margin: '0 0 6px' }}>See you on the trails,<br />the Otto1890 Weekend Warrior team</Text>
       </Section>
-      <WarriorPartners signOff={<>See you on the trails,<br />the Otto1890 Weekend Warrior team</>} />
+      <WarriorPartners signOff={null} />
     </Container></Body>
   </Html>
 }

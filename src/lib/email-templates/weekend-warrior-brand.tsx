@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Button, Column, Heading, Img, Link, Row, Section, Text } from '@react-email/components'
-import { RCE_LOGO_URL } from './theme'
 import trails from '@/assets/ww-email/ww-trails.jpg.asset.json'
 import otto from '@/assets/ww-email/ww_logo_otto1890-white.png.asset.json'
 import cycle from '@/assets/ww-email/ww_logo_cycle_lab-white.png.asset.json'
@@ -109,7 +108,7 @@ export function WarriorEntryButtons() {
   </Section>
 }
 
-export function WarriorPartners({ signOff }: { signOff?: React.ReactNode } = {}) {
+export function WarriorPartners({ signOff }: { signOff?: React.ReactNode | null } = {}) {
   return <Section style={{ backgroundColor: ww.white, borderTop: `3px solid ${ww.teal}`, padding: '26px 24px 8px' }}>
     <Heading as="h2" style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: 800, fontSize: '30px', lineHeight: '1.1', color: ww.forest, margin: '0 0 24px' }}>THE PARTNER<br /><span style={{ color: ww.red }}>NETWORK</span></Heading>
     <Text style={{ ...ww.label, color: ww.forest, borderBottom: `1px solid ${ww.line}`, paddingBottom: '10px' }}><span style={{ color: ww.red }}>● </span>OFFICIAL TITLE PARTNER</Text>
@@ -117,8 +116,9 @@ export function WarriorPartners({ signOff }: { signOff?: React.ReactNode } = {})
     <PartnerGroup label="PREMIUM PARTNERS" partners={premiumPartners} columns={4} />
     <PartnerGroup label="EVENT PARTNERS" partners={eventPartners} columns={5} />
     <Section style={{ backgroundColor: ww.white, padding: '24px 16px 12px', borderTop: `1px solid ${ww.line}`, marginTop: '18px' }}>
-      <Img src={RCE_LOGO_URL} alt="Red Cherry Events" width="150" style={{ display: 'block', margin: '0 auto', height: 'auto' }} />
-      <Text style={{ ...ww.text, fontSize: '12px', color: ww.muted, margin: '14px 0 0' }}>{signOff ?? <>See you on the trails.<br />Shaun and the Red Cherry Events team</>}</Text>
+      {/* Solid (non-transparent) logo: mail clients render transparent PNGs unpredictably. */}
+      <Img src={absolute(rcePartner.url)} alt="Red Cherry Events" width="150" style={{ display: 'block', margin: '0 auto', height: 'auto' }} />
+      {signOff === null ? null : <Text style={{ ...ww.text, fontSize: '12px', color: ww.muted, margin: '14px 0 0' }}>{signOff ?? <>See you on the trails.<br />Shaun and the Red Cherry Events team</>}</Text>}
       <Link href="https://www.redcherryevents.co.za" style={{ color: ww.forest, fontSize: '12px' }}>redcherryevents.co.za</Link>
     </Section>
   </Section>
