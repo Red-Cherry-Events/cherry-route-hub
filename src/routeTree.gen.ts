@@ -132,6 +132,7 @@ import { Route as ApiPublicHooksNotificationCronRouteImport } from './routes/api
 import { Route as ApiPublicHooksRoomingSheetSyncRouteImport } from './routes/api/public/hooks/rooming-sheet-sync'
 import { Route as ApiPublicHooksRunSheetSyncRouteImport } from './routes/api/public/hooks/run-sheet-sync'
 import { Route as ApiPublicHooksScheduleSyncRouteImport } from './routes/api/public/hooks/schedule-sync'
+import { Route as ApiPublicHooksTimelinesWhatsappRouteImport } from './routes/api/public/hooks/timelines-whatsapp'
 import { Route as ApiPublicHooksVenueSyncRouteImport } from './routes/api/public/hooks/venue-sync'
 import { Route as ApiPublicHooksWhatsappRouteImport } from './routes/api/public/hooks/whatsapp'
 import { Route as ApiPublicStravaCallbackRouteImport } from './routes/api/public/strava/callback'
@@ -781,6 +782,12 @@ const ApiPublicHooksScheduleSyncRoute =
     path: '/api/public/hooks/schedule-sync',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksTimelinesWhatsappRoute =
+  ApiPublicHooksTimelinesWhatsappRouteImport.update({
+    id: '/api/public/hooks/timelines-whatsapp',
+    path: '/api/public/hooks/timelines-whatsapp',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksVenueSyncRoute = ApiPublicHooksVenueSyncRouteImport.update({
   id: '/api/public/hooks/venue-sync',
   path: '/api/public/hooks/venue-sync',
@@ -953,6 +960,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/rooming-sheet-sync': typeof ApiPublicHooksRoomingSheetSyncRoute
   '/api/public/hooks/run-sheet-sync': typeof ApiPublicHooksRunSheetSyncRoute
   '/api/public/hooks/schedule-sync': typeof ApiPublicHooksScheduleSyncRoute
+  '/api/public/hooks/timelines-whatsapp': typeof ApiPublicHooksTimelinesWhatsappRoute
   '/api/public/hooks/venue-sync': typeof ApiPublicHooksVenueSyncRoute
   '/api/public/hooks/whatsapp': typeof ApiPublicHooksWhatsappRoute
   '/api/public/strava/callback': typeof ApiPublicStravaCallbackRoute
@@ -1083,6 +1091,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/rooming-sheet-sync': typeof ApiPublicHooksRoomingSheetSyncRoute
   '/api/public/hooks/run-sheet-sync': typeof ApiPublicHooksRunSheetSyncRoute
   '/api/public/hooks/schedule-sync': typeof ApiPublicHooksScheduleSyncRoute
+  '/api/public/hooks/timelines-whatsapp': typeof ApiPublicHooksTimelinesWhatsappRoute
   '/api/public/hooks/venue-sync': typeof ApiPublicHooksVenueSyncRoute
   '/api/public/hooks/whatsapp': typeof ApiPublicHooksWhatsappRoute
   '/api/public/strava/callback': typeof ApiPublicStravaCallbackRoute
@@ -1218,6 +1227,7 @@ export interface FileRoutesById {
   '/api/public/hooks/rooming-sheet-sync': typeof ApiPublicHooksRoomingSheetSyncRoute
   '/api/public/hooks/run-sheet-sync': typeof ApiPublicHooksRunSheetSyncRoute
   '/api/public/hooks/schedule-sync': typeof ApiPublicHooksScheduleSyncRoute
+  '/api/public/hooks/timelines-whatsapp': typeof ApiPublicHooksTimelinesWhatsappRoute
   '/api/public/hooks/venue-sync': typeof ApiPublicHooksVenueSyncRoute
   '/api/public/hooks/whatsapp': typeof ApiPublicHooksWhatsappRoute
   '/api/public/strava/callback': typeof ApiPublicStravaCallbackRoute
@@ -1354,6 +1364,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/rooming-sheet-sync'
     | '/api/public/hooks/run-sheet-sync'
     | '/api/public/hooks/schedule-sync'
+    | '/api/public/hooks/timelines-whatsapp'
     | '/api/public/hooks/venue-sync'
     | '/api/public/hooks/whatsapp'
     | '/api/public/strava/callback'
@@ -1484,6 +1495,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/rooming-sheet-sync'
     | '/api/public/hooks/run-sheet-sync'
     | '/api/public/hooks/schedule-sync'
+    | '/api/public/hooks/timelines-whatsapp'
     | '/api/public/hooks/venue-sync'
     | '/api/public/hooks/whatsapp'
     | '/api/public/strava/callback'
@@ -1618,6 +1630,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/rooming-sheet-sync'
     | '/api/public/hooks/run-sheet-sync'
     | '/api/public/hooks/schedule-sync'
+    | '/api/public/hooks/timelines-whatsapp'
     | '/api/public/hooks/venue-sync'
     | '/api/public/hooks/whatsapp'
     | '/api/public/strava/callback'
@@ -1704,6 +1717,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRoomingSheetSyncRoute: typeof ApiPublicHooksRoomingSheetSyncRoute
   ApiPublicHooksRunSheetSyncRoute: typeof ApiPublicHooksRunSheetSyncRoute
   ApiPublicHooksScheduleSyncRoute: typeof ApiPublicHooksScheduleSyncRoute
+  ApiPublicHooksTimelinesWhatsappRoute: typeof ApiPublicHooksTimelinesWhatsappRoute
   ApiPublicHooksVenueSyncRoute: typeof ApiPublicHooksVenueSyncRoute
   ApiPublicHooksWhatsappRoute: typeof ApiPublicHooksWhatsappRoute
   ApiPublicStravaCallbackRoute: typeof ApiPublicStravaCallbackRoute
@@ -2578,6 +2592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksScheduleSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/timelines-whatsapp': {
+      id: '/api/public/hooks/timelines-whatsapp'
+      path: '/api/public/hooks/timelines-whatsapp'
+      fullPath: '/api/public/hooks/timelines-whatsapp'
+      preLoaderRoute: typeof ApiPublicHooksTimelinesWhatsappRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/venue-sync': {
       id: '/api/public/hooks/venue-sync'
       path: '/api/public/hooks/venue-sync'
@@ -2867,6 +2888,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRoomingSheetSyncRoute: ApiPublicHooksRoomingSheetSyncRoute,
   ApiPublicHooksRunSheetSyncRoute: ApiPublicHooksRunSheetSyncRoute,
   ApiPublicHooksScheduleSyncRoute: ApiPublicHooksScheduleSyncRoute,
+  ApiPublicHooksTimelinesWhatsappRoute: ApiPublicHooksTimelinesWhatsappRoute,
   ApiPublicHooksVenueSyncRoute: ApiPublicHooksVenueSyncRoute,
   ApiPublicHooksWhatsappRoute: ApiPublicHooksWhatsappRoute,
   ApiPublicStravaCallbackRoute: ApiPublicStravaCallbackRoute,
