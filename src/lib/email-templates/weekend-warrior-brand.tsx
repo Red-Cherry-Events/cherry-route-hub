@@ -109,7 +109,7 @@ export function WarriorEntryButtons() {
   </Section>
 }
 
-export function WarriorPartners() {
+export function WarriorPartners({ signOff }: { signOff?: React.ReactNode } = {}) {
   return <Section style={{ backgroundColor: ww.white, borderTop: `3px solid ${ww.teal}`, padding: '26px 24px 8px' }}>
     <Heading as="h2" style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: 800, fontSize: '30px', lineHeight: '1.1', color: ww.forest, margin: '0 0 24px' }}>THE PARTNER<br /><span style={{ color: ww.red }}>NETWORK</span></Heading>
     <Text style={{ ...ww.label, color: ww.forest, borderBottom: `1px solid ${ww.line}`, paddingBottom: '10px' }}><span style={{ color: ww.red }}>● </span>OFFICIAL TITLE PARTNER</Text>
@@ -118,7 +118,7 @@ export function WarriorPartners() {
     <PartnerGroup label="EVENT PARTNERS" partners={eventPartners} columns={5} />
     <Section style={{ backgroundColor: ww.white, padding: '24px 16px 12px', borderTop: `1px solid ${ww.line}`, marginTop: '18px' }}>
       <Img src={RCE_LOGO_URL} alt="Red Cherry Events" width="150" style={{ display: 'block', margin: '0 auto', height: 'auto' }} />
-      <Text style={{ ...ww.text, fontSize: '12px', color: ww.muted, margin: '14px 0 0' }}>See you on the trails.<br />Shaun and the Red Cherry Events team</Text>
+      <Text style={{ ...ww.text, fontSize: '12px', color: ww.muted, margin: '14px 0 0' }}>{signOff ?? <>See you on the trails.<br />Shaun and the Red Cherry Events team</>}</Text>
       <Link href="https://www.redcherryevents.co.za" style={{ color: ww.forest, fontSize: '12px' }}>redcherryevents.co.za</Link>
     </Section>
   </Section>
