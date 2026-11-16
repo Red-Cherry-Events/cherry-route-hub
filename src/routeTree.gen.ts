@@ -101,6 +101,7 @@ import { Route as ApiPublicOgRouteImport } from './routes/api/public/og'
 import { Route as ApiPublicS2sEnquiryRouteImport } from './routes/api/public/s2s-enquiry'
 import { Route as ApiPublicTdaEnquiryRouteImport } from './routes/api/public/tda-enquiry'
 import { Route as ApiPublicTdaNewsletterRouteImport } from './routes/api/public/tda-newsletter'
+import { Route as ApiPublicWebsiteSignupRouteImport } from './routes/api/public/website-signup'
 import { Route as CrewDepartmentDeptIdRouteImport } from './routes/crew.department.$deptId'
 import { Route as CrewLearnIndexRouteImport } from './routes/crew.learn.index'
 import { Route as CrewLearnCourseIdRouteImport } from './routes/crew.learn.$courseId'
@@ -608,6 +609,11 @@ const ApiPublicTdaNewsletterRoute = ApiPublicTdaNewsletterRouteImport.update({
   path: '/api/public/tda-newsletter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebsiteSignupRoute = ApiPublicWebsiteSignupRouteImport.update({
+  id: '/api/public/website-signup',
+  path: '/api/public/website-signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CrewDepartmentDeptIdRoute = CrewDepartmentDeptIdRouteImport.update({
   id: '/crew/department/$deptId',
   path: '/crew/department/$deptId',
@@ -913,6 +919,7 @@ export interface FileRoutesByFullPath {
   '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
+  '/api/public/website-signup': typeof ApiPublicWebsiteSignupRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1042,6 +1049,7 @@ export interface FileRoutesByTo {
   '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
+  '/api/public/website-signup': typeof ApiPublicWebsiteSignupRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1176,6 +1184,7 @@ export interface FileRoutesById {
   '/api/public/s2s-enquiry': typeof ApiPublicS2sEnquiryRoute
   '/api/public/tda-enquiry': typeof ApiPublicTdaEnquiryRoute
   '/api/public/tda-newsletter': typeof ApiPublicTdaNewsletterRoute
+  '/api/public/website-signup': typeof ApiPublicWebsiteSignupRoute
   '/crew/department/$deptId': typeof CrewDepartmentDeptIdRoute
   '/crew/learn/$courseId': typeof CrewLearnCourseIdRoute
   '/crew/learn/calendar': typeof CrewLearnCalendarRoute
@@ -1311,6 +1320,7 @@ export interface FileRouteTypes {
     | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
+    | '/api/public/website-signup'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1440,6 +1450,7 @@ export interface FileRouteTypes {
     | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
+    | '/api/public/website-signup'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1573,6 +1584,7 @@ export interface FileRouteTypes {
     | '/api/public/s2s-enquiry'
     | '/api/public/tda-enquiry'
     | '/api/public/tda-newsletter'
+    | '/api/public/website-signup'
     | '/crew/department/$deptId'
     | '/crew/learn/$courseId'
     | '/crew/learn/calendar'
@@ -1665,6 +1677,7 @@ export interface RootRouteChildren {
   ApiPublicS2sEnquiryRoute: typeof ApiPublicS2sEnquiryRoute
   ApiPublicTdaEnquiryRoute: typeof ApiPublicTdaEnquiryRoute
   ApiPublicTdaNewsletterRoute: typeof ApiPublicTdaNewsletterRoute
+  ApiPublicWebsiteSignupRoute: typeof ApiPublicWebsiteSignupRoute
   CrewDepartmentDeptIdRoute: typeof CrewDepartmentDeptIdRoute
   CrewLearnCourseIdRoute: typeof CrewLearnCourseIdRoute
   CrewLearnCalendarRoute: typeof CrewLearnCalendarRoute
@@ -2348,6 +2361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTdaNewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/website-signup': {
+      id: '/api/public/website-signup'
+      path: '/api/public/website-signup'
+      fullPath: '/api/public/website-signup'
+      preLoaderRoute: typeof ApiPublicWebsiteSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/crew/department/$deptId': {
       id: '/crew/department/$deptId'
       path: '/crew/department/$deptId'
@@ -2820,6 +2840,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicS2sEnquiryRoute: ApiPublicS2sEnquiryRoute,
   ApiPublicTdaEnquiryRoute: ApiPublicTdaEnquiryRoute,
   ApiPublicTdaNewsletterRoute: ApiPublicTdaNewsletterRoute,
+  ApiPublicWebsiteSignupRoute: ApiPublicWebsiteSignupRoute,
   CrewDepartmentDeptIdRoute: CrewDepartmentDeptIdRoute,
   CrewLearnCourseIdRoute: CrewLearnCourseIdRoute,
   CrewLearnCalendarRoute: CrewLearnCalendarRoute,
