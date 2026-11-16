@@ -9,6 +9,13 @@
 
 # Roadmap
 
+## Otto1890 Weekend Warrior on SuperSport mailer (Shaun, 16 Nov)
+- [x] Host the SuperSport hero permanently as JPG, verified 200
+- [x] Build the mailer from the shared Otto1890 email module, solid PNG/JPG images only
+- [x] Create Everlytic draft 926722 with no audience attached, one test sent to Shaun only
+- [x] Count proposed audience: 1,619 unique subscribed contacts across 13 lists, campaign 923637 untouched
+- [ ] Attach audience, set A/B subjects and arm for Tue 17 Nov 09:00 SAST (waiting on Shaun's approval)
+
 ## JBFE Sea to Sea website enquiries (Shaun, 15 Nov)
 - [x] Add validated public enquiry endpoint, stored admin rows and action-triggered emails
 - [x] Verify Everlytic enquiry/master lists and consent-only North interest recording, no schema change
