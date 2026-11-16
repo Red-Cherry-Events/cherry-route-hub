@@ -2,13 +2,13 @@
 import * as React from 'react'
 import { Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Text } from '@react-email/components'
 import { WarriorPartners, ww } from './weekend-warrior-brand'
-import hero from '@/assets/ww-email/ww_cadence_supersport_1080x1350.jpg.asset.json'
+import hero from '@/assets/ww-email/ww_cadence_supersport_drone_1080x1350.jpg.asset.json'
 
 export const SUPERSPORT_SUBJECT = 'Catch Weekend Warrior on SuperSport tonight 📺'
 export const SUPERSPORT_SUBJECT_ALTERNATES = ['You might be on TV tonight 👀', 'Lourensford hits SuperSport tonight'] as const
 export const SUPERSPORT_PREHEADER = 'Toyota Cadence, 7pm on Channel 206. Plus your 2027 dates.'
 export const SUPERSPORT_HERO_URL = new URL(hero.url, 'https://riderhub.redcherryevents.co.za').href
-export const SUPERSPORT_HERO_ALT = 'Catch us on SuperSport: Tomorrow, 7pm, Channel 206'
+export const SUPERSPORT_HERO_ALT = 'Catch us on SuperSport: 17 November, 7pm, Channel 206'
 // The app's own Otto1890 Weekend Warrior 2027 entry-alert sign-up page.
 export const SUPERSPORT_REMINDER_URL = 'https://riderhub.redcherryevents.co.za/otto1890-signup'
 const archival = '#FBFAF2'
