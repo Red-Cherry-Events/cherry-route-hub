@@ -4421,6 +4421,54 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_bot_chats: {
+        Row: {
+          answered_uid: string | null
+          chat_id: number
+          handoff_until: string | null
+          last_alert_at: string | null
+          latest_in_uid: string | null
+          updated_at: string
+        }
+        Insert: {
+          answered_uid?: string | null
+          chat_id: number
+          handoff_until?: string | null
+          last_alert_at?: string | null
+          latest_in_uid?: string | null
+          updated_at?: string
+        }
+        Update: {
+          answered_uid?: string | null
+          chat_id?: number
+          handoff_until?: string | null
+          last_alert_at?: string | null
+          latest_in_uid?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_bot_messages: {
+        Row: {
+          chat_id: number
+          created_at: string
+          direction: string
+          uid: string
+        }
+        Insert: {
+          chat_id: number
+          created_at?: string
+          direction?: string
+          uid: string
+        }
+        Update: {
+          chat_id?: number
+          created_at?: string
+          direction?: string
+          uid?: string
+        }
+        Relationships: []
+      }
       whatsapp_opt_outs: {
         Row: {
           created_at: string
