@@ -18,12 +18,24 @@ const schema = z.object({
 });
 
 export async function handleEventInterest(request: Request): Promise<Response> {
-        // Shared secret, server to server — no CORS, no browser callers.
-        const expected = process.env["EVENT_INTEREST_KEY"];
-        if (!expected) return json({ ok: false, error: "Event interest sign-ups are not configured" }, 503);
-        const key = request.headers.get("x-event-interest-key") ?? "";
-        if (!key || key !== expected) return json({ ok: false, error: "Unauthorized" }, 401);
+  // Shared secret, server to server: no CORS, no browser callers.
+  const expected = process.env["EVENT_INTEREST_KEY"];
+  if (!expected) return json({ ok: false, error: "Event interest sign-ups are not configured" }, 503);
+  const key = request.headers.get("x-event-interest-key") ?? "";
+  if (!key || key !== expected) return json({ ok: false, error: "Unauthorized" }, 401);
+  const { status, body } = await processEventInterest(request, {});
+  return json(body, status);
+}
 
+export type InterestResult = { status: number; body: { ok: boolean; error?: string; id?: string } };
+
+/** Core sign-up shared by the secret-gated and origin-gated routes. When
+ * `websiteHost` is set, only events whose website_url host matches may be used. */
+export async function processEventInterest(
+  request: Request,
+  opts: { websiteHost?: string },
+): Promise<InterestResult> {
+  const json = (body: InterestResult["body"], status = 200): InterestResult => ({ status, body });
         let parsed;
         try {
           const raw = request.headers.get("content-type")?.includes("json")
@@ -40,7 +52,9 @@ export async function handleEventInterest(request: Request): Promise<Response> {
         }
         if (!parsed.success) {
           const first = parsed.error.issues[0];
-          return json({ ok: false, error: first ? `${first.path.join(".")}: ${first.message}` : "Invalid request" }, 400);
+          const field = first?.path[0];
+          const friendly = field === "email" ? "Please check your email address." : field === "consent" ? "Please tick the box to agree to receive emails." : field === "event_id" ? "This sign-up form is not set up correctly." : first ? `${first.path.join(".")}: ${first.message}` : "Invalid request";
+          return json({ ok: false, error: friendly }, 400);
         }
         if (parsed.data.website) return json({ ok: true }); // honeypot: pretend it worked
 
@@ -59,11 +73,14 @@ export async function handleEventInterest(request: Request): Promise<Response> {
         // The event must exist and be published.
         const { data: event } = await supabaseAdmin
           .from("events")
-          .select("id, name, slug, lifecycle, everlytic_interest_list_id, is_review_event")
+          .select("id, name, slug, lifecycle, everlytic_interest_list_id, is_review_event, website_url")
           .eq("id", parsed.data.event_id)
           .maybeSingle();
         if (!event || event.lifecycle !== 'published' || event.is_review_event) {
           return json({ ok: false, error: "Unknown event" }, 404);
+        }
+        if (opts.websiteHost && websiteHostOf(event.website_url) !== opts.websiteHost) {
+          return json({ ok: false, error: "Sign-ups for this event are not available on this website" }, 403);
         }
 
         const email = normaliseEmail(parsed.data.email);
@@ -148,4 +165,8 @@ export async function handleEventInterest(request: Request): Promise<Response> {
         }
 
         return json({ ok: true, id: signupId });
+}
+
+export function websiteHostOf(url: string | null | undefined): string | null {
+  try { return url ? new URL(url).hostname.toLowerCase().replace(/^www\./, "") : null; } catch { return null; }
 }
