@@ -17,6 +17,8 @@ export const getEventPhotos = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }): Promise<EventPhotosResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { assertEventVisibleToCaller } = await import("@/lib/review-event.server");
+    await assertEventVisibleToCaller(supabaseAdmin, data.eventId);
 
     const { data: ev } = await supabaseAdmin
       .from("events")
