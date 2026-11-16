@@ -550,7 +550,7 @@ export async function sendPendingEntryWelcomes(
         break;
       }
       if (result.errors.length < 10) {
-        result.errors.push(`${email}: ${(err as Error).message}`);
+        result.errors.push(`${email.replace(/^(.).*(@.*)$/, "$1***$2")}: ${(err as Error).message}`);
       }
     }
   }

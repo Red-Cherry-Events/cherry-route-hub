@@ -316,6 +316,8 @@ export const sendWorkflowStepTest = createServerFn({ method: "POST" })
     // Extra named recipients (e.g. crew or partners who aren't entered):
     // real sends, recorded so they're never repeated.
     if (data.to?.length) {
+      const { allowedTestRecipient } = await import("./test-recipient.server");
+      for (const to of data.to) allowedTestRecipient(to, (context as any).claims?.email);
       for (const to of data.to) {
         await sendWorkflowEmail(supabaseAdmin, {
           campaignId: (step as any).campaign_id,

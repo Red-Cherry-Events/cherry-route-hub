@@ -122,8 +122,8 @@ export const sendTestEntryWelcome = createServerFn({ method: "POST" })
     const isAdmin = await checkIsAdmin(context.supabase as never);
     if (!isAdmin) throw new Error("Forbidden");
 
-    const to = (data.email || (context.claims as any)?.email || "").trim().toLowerCase();
-    if (!to) throw new Error("No admin email address to send to");
+    const { allowedTestRecipient } = await import("./test-recipient.server");
+    const to = allowedTestRecipient(data.email, (context.claims as any)?.email);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { loadPromoRows, offersForEvent, venueMapUrl, riderScheduleForEmail, absoluteLogo, scheduleTrustedEventIds } = await import("./entry-welcome.server");
