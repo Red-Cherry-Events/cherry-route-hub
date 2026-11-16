@@ -124,3 +124,4 @@
 - [x] 3 new tests (99 pass), build OK
 - [ ] Publish
 
+- [x] GravDuro website newsletter sign-up endpoint + Everlytic list 147011
