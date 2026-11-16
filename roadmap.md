@@ -125,3 +125,4 @@
 - [ ] Publish
 
 - [x] GravDuro website newsletter sign-up endpoint + Everlytic list 147011
+- [ ] WhatsApp auto-reply (TimelinesAI): built; waiting on TIMELINES_API_TOKEN and webhook registration

@@ -31,6 +31,7 @@ import {
   X,
 } from "lucide-react";
 import { useAdminStore } from "@/lib/store";
+import { WhatsappAutoReplyCard } from "@/components/whatsapp-autoreply-card";
 import { useHydratedStore } from "@/lib/use-hydrated-store";
 import {
   QUICK_LINK_ICONS,
@@ -127,6 +128,7 @@ function AdminSettings() {
           initial={settings.kcaCampaign}
           onSaved={(campaign) => setSettings({ kcaCampaign: campaign })}
         />
+        <WhatsappAutoReplyCard />
         <QuickLinksCard
           value={quickLinks}
           onChange={setQuickLinks}
