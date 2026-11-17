@@ -5,7 +5,7 @@ import { EmailAPIError } from "@lovable.dev/email-js";
 
 import { normaliseBlocks } from "./email-blocks";
 import { sendTemplateEmail } from "./email-templates/send-email";
-import { absoluteLogo } from "./entry-welcome.server";
+import { absoluteLogo, loadPromoRows, offersForEvent } from "./entry-welcome.server";
 import { buildPePlettExtrasEmailData } from "./pe-plett-extras.server";
 
 type AnyClient = any;
@@ -213,6 +213,7 @@ export async function sendWorkflowEmail(
       venue: event.location ?? null,
       eventCoverUrl: absoluteLogo(event.cover_url),
       eventLogoUrl: absoluteLogo(event.logo_url),
+      offers: /grav\s*duro/i.test(event.name ?? '') ? offersForEvent(await loadPromoRows(admin), event.name) : [],
       bannerUrl: absoluteLogo(step.banner_url),
       theme: step.theme ?? null,
       unsubscribeUrl: opts.unsubscribeUrl ?? null,
