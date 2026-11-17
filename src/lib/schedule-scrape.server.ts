@@ -85,10 +85,11 @@ function pickPages(
 const RANGE_SPLIT = /\s*(?:–|—|-|to|until|till)\s*/i;
 
 function normaliseClock(t: string): string | null {
-  const m = t.trim().match(/^(\d{1,2})[:h.](\d{2})\s*(am|pm)?$/i);
+  const m = t.trim().match(/^(\d{1,2})(?:[:h.](\d{2}))?\s*(am|pm)?$/i);
   if (!m) return null;
+  if (!m[2] && !m[3]) return null;
   let hour = Number(m[1]);
-  const min = m[2];
+  const min = m[2] ?? '00';
   const ampm = m[3]?.toLowerCase();
   if (ampm === "pm" && hour < 12) hour += 12;
   if (ampm === "am" && hour === 12) hour = 0;
@@ -113,10 +114,11 @@ function normaliseTime(raw: string): string {
 function sourceTimes(pages: { text: string }[]): Set<string> {
   const found = new Set<string>();
   for (const p of pages) {
-    for (const m of p.text.matchAll(/\b(\d{1,2})[:h.](\d{2})\s*(am|pm)?\b/gi)) {
-      const norm = normaliseClock(`${m[1]}:${m[2]}${m[3] ? m[3] : ""}`);
+    for (const m of p.text.matchAll(/\b(?:\d{1,2}[:h.]\d{2}\s*(?:am|pm)?|\d{1,2}\s*(?:am|pm))\b/gi)) {
+      const norm = normaliseClock(m[0]);
       if (norm) found.add(norm);
     }
+    if (/\bnoon\b/i.test(p.text)) found.add('12:00');
   }
   return found;
 }
