@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { riderScheduleForEmail, offersForEvent } from './entry-welcome.server';
 import { eventPromosFrom } from './event-promos';
 import type { Promo } from './mock-data';
+import { sendScheduleApologies } from './schedule-apology.server';
 
 const name = 'GravDuro powered by Westvaal Somerset West Isuzu 2027';
 test('GravDuro email carries website times including both cut-offs', () => {
@@ -20,6 +21,24 @@ test('GravDuro email carries website times including both cut-offs', () => {
   ].map(([time, label]) => ({ time, label, dayId: 'd1' }));
   const days = riderScheduleForEmail({ days: [{ id: 'd1', label: 'Race day', date: '2027-05-30' }], schedule }, '6 Timed Stages');
   assert.deepEqual(days[0]?.items.map(i => i.time), ['06:30','08:00','08:05','08:20','08:25','08:30','08:35','13:00','13:15','14:00']);
+});
+test('GravDuro correction excludes entrants who did not receive TBC welcome times', async () => {
+  const admin = {
+    from(table: string) {
+      const result = table === 'events'
+        ? { data: { id: 'gravduro', name } }
+        : table === 'email_sends'
+          ? { data: [{ recipient: 'affected@example.com' }] }
+          : { data: [{ id: 'new', entrants: { email: 'new@example.com' } }] };
+      const query: any = { then: (resolve: any) => Promise.resolve(result).then(resolve) };
+      for (const method of ['select', 'eq', 'ilike', 'limit', 'is', 'maybeSingle']) query[method] = () => query;
+      return query;
+    },
+  };
+  const result = await sendScheduleApologies(admin, { eventId: 'gravduro' });
+  assert.equal(result.sent, 0);
+  assert.equal(result.candidates, 0);
+  assert.equal(result.skipped, 1);
 });
 test('GravDuro uses the same three existing offers in app and emails', () => {
   const promos = [
