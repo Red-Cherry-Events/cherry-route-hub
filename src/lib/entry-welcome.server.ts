@@ -192,7 +192,7 @@ export function venueMapUrl(
 }
 
 const REG_LINE = /(registration|register|check[- ]?in|briefing)/i;
-const KEY_LINE = /(start|briefing|registration|check[- ]?in|prize|batch|cut[- ]?off)/i;
+const KEY_LINE = /(start|briefing|registration|check[- ]?in|prize|batch|cut[- ]?off|riders? depart|ride begins)/i;
 const TIERS = ["gold", "silver", "bronze"];
 
 /** The tier word on a rider's category, e.g. "Silver - U/14 …" -> "silver". */
