@@ -9,6 +9,10 @@
 
 # Roadmap
 
+## Website-backed upcoming mailers (Shaun, 17 Nov)
+- [ ] Check Otto1890 Weekend Warrior, JBFE Sea to Sea and TDA Nyati website times and entry-opening details
+- [ ] Correct missing website links or mailer schedule filtering, test all relevant events without sending rider emails
+
 ## GravDuro times and rider offers (Shaun, 17 Nov)
 - [x] Send corrected times and offers only to riders whose welcome email showed TBC, verify future welcome emails (one affected rider, accepted; three tests passed)
 - [x] Verify website times, welcome mailer schedule and Westvaal Isuzu footer logo
