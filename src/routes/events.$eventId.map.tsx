@@ -4,6 +4,21 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteMap } from "@/components/route-map";
+import { VillageMapView } from "@/components/village-map-view";
+
+// Some events (Inner City Enduro) have no GPX routes — their course is drawn
+// on the race village map. The route map page falls back to that map so links
+// to /events/:id/map never land on a blank "no routes" state.
+function eventHasRoutes(days: unknown): boolean {
+  if (!Array.isArray(days)) return false;
+  for (const day of days) {
+    for (const r of (day as any)?.routes ?? []) {
+      if ((r?.kmlUrls ?? []).length > 0) return true;
+      if ((r?.customMarkers ?? []).some((m: any) => m?.icon !== "warning" && m?.icon !== "aid")) return true;
+    }
+  }
+  return false;
+}
 
 export const Route = createFileRoute("/events/$eventId/map")({
   loader: async ({ params }) => {
@@ -13,7 +28,15 @@ export const Route = createFileRoute("/events/$eventId/map")({
       .eq("id", params.eventId)
       .maybeSingle();
     if (error || !data) throw notFound();
-    return { event: data };
+    let hasVillageMap = false;
+    if (!eventHasRoutes(data.days)) {
+      const { count } = await supabase
+        .from("event_village_maps")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", params.eventId);
+      hasVillageMap = (count ?? 0) > 0;
+    }
+    return { event: data, hasVillageMap };
   },
   head: ({ params }) => ({ meta: [
       ...ogImageMeta(eventOgImageUrl(params.eventId, "Route map"), "Event route map"),
@@ -37,7 +60,8 @@ export const Route = createFileRoute("/events/$eventId/map")({
 });
 
 function FullscreenMap() {
-  const { event } = Route.useLoaderData();
+  const { event, hasVillageMap } = Route.useLoaderData();
+  const villageFallback = !eventHasRoutes(event.days) && hasVillageMap;
   return (
     <div className="flex h-[100dvh] flex-col bg-background">
       <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3">
@@ -50,12 +74,18 @@ function FullscreenMap() {
           <ArrowLeft className="h-5 w-5" />
         </BackLink>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Route map</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-ink-soft">
+            {villageFallback ? "Route & village map" : "Route map"}
+          </p>
           <h1 className="truncate font-display text-base font-bold text-ink">{event.name}</h1>
         </div>
       </header>
-      <div className="flex-1 overflow-hidden">
-        <RouteMap event={event as never} height="100%" />
+      <div className="relative flex-1 overflow-hidden">
+        {villageFallback ? (
+          <VillageMapView eventId={event.id} riderOnly startFullscreen />
+        ) : (
+          <RouteMap event={event as never} height="100%" />
+        )}
       </div>
     </div>
   );
