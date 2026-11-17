@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Button, Heading, Img, Link, Section, Text } from '@react-email/components'
 
 import type { TemplateEntry } from './registry'
-import type { EmailOffer } from './entry-welcome'
+import { RiderOffers, type EmailOffer } from './entry-welcome'
 import { EmailShell, brand, button, h1, link, text } from './theme'
 
 /** One day of the rider's confirmed times. */
@@ -159,21 +159,7 @@ export const ScheduleApologyEmail = ({
       ) : null}
     </Section>
 
-    {offers.length > 0 ? (
-      <Section>
-        <Heading style={scheduleDayTitle}>Your rider offers</Heading>
-        {offers.map((offer) => (
-          <Section key={offer.brand} style={scheduleDay}>
-            <Text style={scheduleDayTitle}>{offer.brand} · {offer.title}</Text>
-            {offer.blurb ? <Text style={text}>{offer.blurb}</Text> : null}
-            <Text style={text}>
-              {offer.code ? `Use code ${offer.code}` : offer.redeem}
-            </Text>
-            {offer.url ? <Link href={offer.url} style={link}>{offer.ctaLabel || 'View offer'}</Link> : null}
-          </Section>
-        ))}
-      </Section>
-    ) : null}
+    <RiderOffers offers={offers} eventName={eventName} />
 
     <Button style={button} href={eventUrl}>
       Open your event page

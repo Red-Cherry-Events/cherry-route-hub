@@ -254,6 +254,59 @@ const offerCta = {
 
 
 
+export const RiderOffers = ({ offers, eventName }: { offers: EmailOffer[]; eventName: string }) => (
+  offers.length > 0 ? (
+      <Section style={{ margin: '0 0 24px' }}>
+        <Text style={offersHeading}>Your rider offers for {eventName}</Text>
+        {offers.map((o, i) => (
+          <Section
+            key={`${o.brand}-${i}`}
+            style={{ ...offerCard, backgroundColor: o.accent || brand.orange }}
+          >
+            <Row>
+              {o.logoUrl ? (
+                <Column style={logoCell}>
+                  <Img src={o.logoUrl} alt={`${o.brand} logo`} width="48" height="48" style={logoImg} />
+                </Column>
+              ) : null}
+              <Column>
+                <Text style={offerEyebrow}>Rider offer · {o.brand}</Text>
+                <Text style={offerCardTitle}>{o.title}</Text>
+                {o.blurb ? <Text style={offerCardBlurb}>{o.blurb}</Text> : null}
+              </Column>
+              {o.discount ? (
+                <Column style={discountCell}>
+                  <span style={discountPill}>{o.discount}</span>
+                </Column>
+              ) : null}
+            </Row>
+
+            <Text style={offerClaimLine}>
+              {o.code ? (
+                <>
+                  How to claim: use code <span style={offerCode}>{o.code}</span>
+                </>
+              ) : (
+                <>How to claim: {o.redeem}</>
+              )}
+            </Text>
+
+            {o.url ? (
+              <Text style={{ margin: '10px 0 0' }}>
+                <Link href={o.url} style={offerCta}>
+                  {o.ctaLabel || (o.code ? 'Get the code' : 'View offer')}
+                </Link>
+              </Text>
+            ) : null}
+          </Section>
+        ))}
+        <Text style={{ ...offerNote, margin: '10px 0 0' }}>
+          Offers can change, the latest ones are always in the app under Promos.
+        </Text>
+      </Section>
+    ) : null
+)
+
 const FEATURES: { icon: string; title: string; note: string }[] = [
   { icon: '🗺️', title: 'Routes & elevation', note: 'every distance mapped, with water points, cut-offs and hover-linked climb profiles.' },
   { icon: '🕒', title: 'Day-by-day schedule', note: 'registration, briefings and start times, kept in sync with the event website.' },
@@ -403,56 +456,7 @@ export const EntryWelcomeEmail = ({
       </Link>
     </Text>
 
-    {offers.length > 0 ? (
-      <Section style={{ margin: '0 0 24px' }}>
-        <Text style={offersHeading}>Your rider offers for {eventName}</Text>
-        {offers.map((o, i) => (
-          <Section
-            key={`${o.brand}-${i}`}
-            style={{ ...offerCard, backgroundColor: o.accent || brand.orange }}
-          >
-            <Row>
-              {o.logoUrl ? (
-                <Column style={logoCell}>
-                  <Img src={o.logoUrl} alt={`${o.brand} logo`} width="48" height="48" style={logoImg} />
-                </Column>
-              ) : null}
-              <Column>
-                <Text style={offerEyebrow}>Rider offer · {o.brand}</Text>
-                <Text style={offerCardTitle}>{o.title}</Text>
-                {o.blurb ? <Text style={offerCardBlurb}>{o.blurb}</Text> : null}
-              </Column>
-              {o.discount ? (
-                <Column style={discountCell}>
-                  <span style={discountPill}>{o.discount}</span>
-                </Column>
-              ) : null}
-            </Row>
-
-            <Text style={offerClaimLine}>
-              {o.code ? (
-                <>
-                  How to claim: use code <span style={offerCode}>{o.code}</span>
-                </>
-              ) : (
-                <>How to claim: {o.redeem}</>
-              )}
-            </Text>
-
-            {o.url ? (
-              <Text style={{ margin: '10px 0 0' }}>
-                <Link href={o.url} style={offerCta}>
-                  {o.ctaLabel || (o.code ? 'Get the code' : 'View offer')}
-                </Link>
-              </Text>
-            ) : null}
-          </Section>
-        ))}
-        <Text style={{ ...offerNote, margin: '10px 0 0' }}>
-          Offers can change — the latest ones are always in the app under Promos.
-        </Text>
-      </Section>
-    ) : null}
+    <RiderOffers offers={offers} eventName={eventName} />
 
 
     <Text style={footer}>
