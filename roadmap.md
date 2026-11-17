@@ -10,6 +10,7 @@
 # Roadmap
 
 ## GravDuro times and rider offers (Shaun, 17 Nov)
+- [ ] Send corrected times and offers only to riders whose welcome email showed TBC, verify future welcome emails
 - [x] Verify website times, welcome mailer schedule and Westvaal Isuzu footer logo
 - [x] Include existing Cycle Lab, Green Motion and Rudy Project offers in app and mailers
 - [x] Test previews and request publication without sending rider emails

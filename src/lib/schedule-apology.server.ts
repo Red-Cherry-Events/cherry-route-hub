@@ -2,6 +2,8 @@
 // verified schedule for the exact trip they entered.
 import {
   absoluteLogo,
+  loadPromoRows,
+  offersForEvent,
   riderScheduleForEmail,
   scheduleTrustedEventIds,
   tripNumberOf,
@@ -53,6 +55,9 @@ export async function buildApologyData(
     eventCoverUrl: absoluteLogo(event.cover_url),
     eventLogoUrl: absoluteLogo(event.logo_url),
     schedule: riderScheduleForEmail(event, opts.category ?? null, { trusted }),
+    offers: /grav\s*duro/i.test(event.name ?? "")
+      ? offersForEvent(await loadPromoRows(admin), event.name)
+      : [],
   };
 }
 
@@ -102,6 +107,20 @@ export async function sendScheduleApologies(
     .maybeSingle();
   if (!event) throw new Error("Event not found");
 
+  // GravDuro corrections are only for addresses whose original welcome had TBC times.
+  const gravduro = /grav\s*duro/i.test(event.name ?? "");
+  let affected: Set<string> | null = null;
+  if (gravduro) {
+    const { data: sends, error: sendsError } = await admin.from("email_sends")
+      .select("recipient, html")
+      .eq("template", "entry-welcome")
+      .eq("suppressed", false)
+      .ilike("html", `%${event.id}%`)
+      .ilike("html", "%Times confirmed closer to the event%");
+    if (sendsError) throw sendsError;
+    affected = new Set((sends ?? []).map((s: any) => s.recipient.trim().toLowerCase()));
+  }
+
   const query = admin
     .from("event_entrants")
     .select("id, category, entrants(full_name, email)")
@@ -119,6 +138,10 @@ export async function sendScheduleApologies(
   for (const row of (data ?? []) as any[]) {
     const email = (row.entrants?.email ?? "").trim().toLowerCase();
     if (!email) {
+      result.skipped++;
+      continue;
+    }
+    if (affected && !affected.has(email)) {
       result.skipped++;
       continue;
     }
