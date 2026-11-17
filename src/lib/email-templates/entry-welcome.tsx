@@ -287,7 +287,7 @@ export const EntryWelcomeEmail = ({
   siteName = 'Red Cherry Events',
   siteUrl = 'https://riderapp.redcherryevents.co.za',
 }: EntryWelcomeProps) => (
-  <EmailShell preview={`You're entered for ${eventName} — everything you need is in the Rider Hub`} siteName={siteName}>
+  <EmailShell preview={`You're entered for ${eventName} · everything you need is in the Rider Hub`} siteName={siteName} eventName={eventName}>
     {eventCoverUrl || eventLogoUrl ? (
       <Section style={eventLogoWrap}>
         <Img
