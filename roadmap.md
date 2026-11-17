@@ -9,6 +9,11 @@
 
 # Roadmap
 
+## GravDuro times and rider offers (Shaun, 17 Nov)
+- [x] Verify website times, welcome mailer schedule and Westvaal Isuzu footer logo
+- [x] Include existing Cycle Lab, Green Motion and Rudy Project offers in app and mailers
+- [x] Test previews and request publication without sending rider emails
+
 ## Otto1890 Weekend Warrior on SuperSport mailer (Shaun, 16 Nov)
 - [x] Host the SuperSport hero permanently as JPG, verified 200
 - [x] Build the mailer from the shared Otto1890 email module, solid PNG/JPG images only

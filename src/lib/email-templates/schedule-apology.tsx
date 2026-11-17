@@ -98,6 +98,7 @@ export const ScheduleApologyEmail = ({
   <EmailShell
     preview={`Your confirmed times for ${tripName ? `${eventName} — ${tripName}` : eventName}`}
     siteName={siteName}
+    eventName={eventName}
   >
     {eventCoverUrl || eventLogoUrl ? (
       <Section style={eventLogoWrap}>

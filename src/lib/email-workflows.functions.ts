@@ -426,7 +426,7 @@ export const renderWorkflowStepPreview = createServerFn({ method: "POST" })
     const { render } = await import("@react-email/render");
     const React = (await import("react")).default;
     const { EventUpdateEmail } = await import("./email-templates/event-update");
-    const { absoluteLogo } = await import("./entry-welcome.server");
+    const { absoluteLogo, loadPromoRows, offersForEvent } = await import("./entry-welcome.server");
 
     const { data: event } = await supabaseAdmin
       .from("events")
@@ -445,6 +445,7 @@ export const renderWorkflowStepPreview = createServerFn({ method: "POST" })
         venue: ev.location ?? null,
         eventCoverUrl: absoluteLogo(ev.cover_url),
         eventLogoUrl: absoluteLogo(ev.logo_url),
+        offers: /grav\s*duro/i.test(ev.name ?? '') ? offersForEvent(await loadPromoRows(supabaseAdmin), ev.name) : [],
         bannerUrl: absoluteLogo(data.bannerUrl ?? null),
         blocks: normaliseBlocks(data.blocks),
         heading: data.heading || data.subject,

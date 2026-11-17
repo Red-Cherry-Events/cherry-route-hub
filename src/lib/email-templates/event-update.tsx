@@ -6,6 +6,7 @@ import { EmailBlockView } from './blocks'
 import type { EmailBlock } from '../email-blocks'
 import type { TemplateEntry } from './registry'
 import { EmailShell, brand, button, h1, link, text } from './theme'
+import type { EmailOffer } from './entry-welcome'
 
 export interface EventUpdateProps {
   firstName?: string | null
@@ -33,6 +34,7 @@ export interface EventUpdateProps {
   theme?: string | null
   /** One-click unsubscribe for interest-list recipients. */
   unsubscribeUrl?: string | null
+  offers?: EmailOffer[]
 }
 
 /** Inner City Enduro: black, red #ed3237, white, navy #1e1954, condensed uppercase headings. */
@@ -88,6 +90,7 @@ export const EventUpdateEmail = ({
   siteUrl = 'https://riderapp.redcherryevents.co.za',
   theme,
   unsubscribeUrl,
+  offers = [],
 }: EventUpdateProps) => {
   const paragraphs = bodyParagraphs(body)
   const banner = bannerUrl || eventCoverUrl || eventLogoUrl
@@ -111,7 +114,7 @@ export const EventUpdateEmail = ({
   const buttonStyle = ice ? { ...button, backgroundColor: ICE.red, borderRadius: '4px', textTransform: 'uppercase' as const, letterSpacing: '0.5px' } : button
 
   return (
-    <EmailShell preview={heading || `An update about ${eventName}`} siteName={siteName} theme={shellTheme}>
+    <EmailShell preview={heading || `An update about ${eventName}`} siteName={siteName} theme={shellTheme} eventName={eventName}>
       {banner ? (
         <Section style={bannerWrap}>
           <Img src={banner} alt={eventName} width="600" style={bannerImg} />
@@ -167,6 +170,19 @@ export const EventUpdateEmail = ({
         .
       </Text>
 
+      {/grav\s*duro/i.test(eventName) && offers.length ? (
+        <Section style={{ margin: '20px 0 0' }}>
+          <Heading style={headingStyle}>Your rider offers</Heading>
+          {offers.map((offer) => (
+            <Text key={offer.brand} style={text}>
+              <strong>{offer.brand}: {offer.title}</strong><br />
+              {offer.blurb}<br />
+              {offer.code ? `Use code ${offer.code} when you book.` : offer.redeem}
+              {offer.url ? <><br /><Link href={offer.url} style={link}>{offer.ctaLabel || 'View offer'}</Link></> : null}
+            </Text>
+          ))}
+        </Section>
+      ) : null}
       {unsubscribeUrl ? (
         <Text style={{ ...meta, margin: '16px 0 0', textAlign: 'center' as const }}>
           You are getting this because you asked for updates about {eventName}.{' '}

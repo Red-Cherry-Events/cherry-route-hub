@@ -14,6 +14,7 @@ import {
 } from '@react-email/components'
 
 import rceLogo from '@/assets/rce-logo.png.asset.json'
+import gravduroPartner from '@/assets/gravduro/westvaal-isuzu-colour.png.asset.json'
 
 /** Absolute URL for the Red Cherry logo — emails can't use relative paths. */
 export const RCE_LOGO_URL = `https://riderapp.redcherryevents.co.za${rceLogo.url}`
@@ -117,11 +118,13 @@ export const EmailShell = ({
   siteName,
   children,
   theme,
+  eventName,
 }: {
   preview: string
   siteName: string
   children: React.ReactNode
   theme?: ShellTheme
+  eventName?: string
 }) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -132,6 +135,11 @@ export const EmailShell = ({
         <Section style={inner}>
           <Text style={theme?.brandColor ? { ...brandName, color: theme.brandColor } : brandName}>{siteName}</Text>
           {children}
+          {/grav\s*duro/i.test(eventName ?? '') ? (
+            <Section style={{ textAlign: 'center' as const, padding: '24px 0 0', backgroundColor: main.backgroundColor }}>
+              <Img src={`https://riderhub.redcherryevents.co.za${gravduroPartner.url}`} alt="Westvaal Somerset West Isuzu" width="240" style={{ display: 'inline-block', width: '240px', maxWidth: '100%', height: 'auto' }} />
+            </Section>
+          ) : null}
           <Hr style={{ borderColor: brand.border, margin: '28px 0 0' }} />
           <Section style={{ textAlign: 'center' as const, padding: '20px 0 0' }}>
             <Img
