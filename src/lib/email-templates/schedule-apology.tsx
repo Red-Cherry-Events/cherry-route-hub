@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Button, Heading, Img, Link, Section, Text } from '@react-email/components'
 
 import type { TemplateEntry } from './registry'
+import type { EmailOffer } from './entry-welcome'
 import { EmailShell, brand, button, h1, link, text } from './theme'
 
 /** One day of the rider's confirmed times. */
@@ -26,6 +27,7 @@ export interface ScheduleApologyProps {
   /** Absolute URL of the event's logo (fallback when there's no cover image). */
   eventLogoUrl?: string | null
   schedule?: ApologyScheduleDay[]
+  offers?: EmailOffer[]
   siteName?: string
   siteUrl?: string
 }
@@ -92,11 +94,12 @@ export const ScheduleApologyEmail = ({
   eventCoverUrl,
   eventLogoUrl,
   schedule = [],
+  offers = [],
   siteName = 'Red Cherry Events',
   siteUrl = 'https://riderapp.redcherryevents.co.za',
 }: ScheduleApologyProps) => (
   <EmailShell
-    preview={`Your confirmed times for ${tripName ? `${eventName} — ${tripName}` : eventName}`}
+    preview={`Your confirmed times for ${tripName ? `${eventName} · ${tripName}` : eventName}`}
     siteName={siteName}
     eventName={eventName}
   >
@@ -109,20 +112,19 @@ export const ScheduleApologyEmail = ({
     <Heading style={h1}>{firstName ? `${firstName}, here are your real times` : 'Here are your real times'}</Heading>
 
     <Text style={text}>
-      Apologies — the email we sent you about <strong>{eventName}</strong> showed
+      Apologies, the email we sent you about <strong>{eventName}</strong> showed
       &ldquo;TBC&rdquo; next to your daily times when the itinerary was in fact already
-      confirmed. That was our mistake, and here is the correct schedule for the trip you
-      are entered for.
+      confirmed. That was our mistake. Here are your correct times{offers.length ? ' and rider offers' : ''}.
     </Text>
 
     <Section style={card}>
-      <Text style={cardTitle}>Your trip</Text>
+      <Text style={cardTitle}>{tripName ? 'Your trip' : 'Your event'}</Text>
       <Text style={tripLine}>{tripName ? `${eventName} · ${tripName}` : eventName}</Text>
       <Text style={meta}>
         {[tripDates, venue].filter(Boolean).join(' · ')}
         {venue && venueUrl ? (
           <>
-            {' — '}
+            {' · '}
             <Link href={venueUrl} style={link}>
               directions
             </Link>
@@ -144,7 +146,7 @@ export const ScheduleApologyEmail = ({
               {d.items.map((it, ii) => (
                 <Text key={`${it.label}-${ii}`} style={scheduleItem}>
                   <strong>{it.time}</strong>
-                  {' — '}
+                  {' · '}
                   <span style={muted}>
                     {it.label}
                     {it.details ? ` (${it.details})` : ''}
@@ -157,6 +159,22 @@ export const ScheduleApologyEmail = ({
       ) : null}
     </Section>
 
+    {offers.length > 0 ? (
+      <Section>
+        <Heading style={scheduleDayTitle}>Your rider offers</Heading>
+        {offers.map((offer) => (
+          <Section key={offer.brand} style={scheduleDay}>
+            <Text style={scheduleDayTitle}>{offer.brand} · {offer.title}</Text>
+            {offer.blurb ? <Text style={text}>{offer.blurb}</Text> : null}
+            <Text style={text}>
+              {offer.code ? `Use code ${offer.code}` : offer.redeem}
+            </Text>
+            {offer.url ? <Link href={offer.url} style={link}>{offer.ctaLabel || 'View offer'}</Link> : null}
+          </Section>
+        ))}
+      </Section>
+    ) : null}
+
     <Button style={button} href={eventUrl}>
       Open your event page
     </Button>
@@ -166,7 +184,7 @@ export const ScheduleApologyEmail = ({
       <Link href={siteUrl} style={link}>
         <strong>Red Cherry Rider Hub</strong>
       </Link>
-      , and we keep it in step with the event website. Thanks for your patience — see you at the
+      , and we keep it in step with the event website. Thanks for your patience. See you at the
       start.
     </Text>
   </EmailShell>
@@ -175,7 +193,7 @@ export const ScheduleApologyEmail = ({
 export const template = {
   component: ScheduleApologyEmail,
   subject: (data: Record<string, any>) =>
-    `Sorry about the TBC times — your confirmed ${data?.tripName ? `${String(data.tripName)} ` : ''}schedule`,
+    `Sorry about the TBC times: your confirmed ${data?.tripName ? `${String(data.tripName)} ` : ''}schedule${data?.offers?.length ? ' and rider offers' : ''}`,
   displayName: 'Schedule correction & apology',
   previewData: {
     firstName: 'Shaun',
