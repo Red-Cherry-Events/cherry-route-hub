@@ -283,6 +283,25 @@ export async function syncAllLinkedEvents(supabase: AnyClient) {
     if (!error) archived = staleIds.length;
   }
 
+  // Page 1 of the feed only holds the newest ~10 events. Older events that are
+  // still linked and live (e.g. Sabrina Love) drop to later pages, so pull the
+  // full feed whenever a live linked event is missing from page 1.
+  const staleSet = new Set(staleIds);
+  const missing = new Set(
+    ((local ?? []) as any[])
+      .filter((e) => e.entry_ninja_id && e.lifecycle !== "archived" && !staleSet.has(e.id))
+      .map((e) => String(e.entry_ninja_id))
+      .filter((id) => !openIds.has(id)),
+  );
+  if (missing.size) {
+    for (const en of await fetchEnEvents()) {
+      if (missing.has(String(en.id))) {
+        enEvents.push(en);
+        openIds.add(String(en.id));
+      }
+    }
+  }
+
   const results: (Pick<SyncResult, "eventName" | "totalEntries" | "created" | "updated" | "linked"> & {
     ok: boolean;
     error?: string;
