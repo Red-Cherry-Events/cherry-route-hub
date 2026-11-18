@@ -37,5 +37,5 @@ export const template = {
   subject: (d: Record<string, any>) => `Tour de Addo enquiry: ${d?.trip ?? 'Not sure yet'} · ${d?.name ?? ''}`,
   displayName: 'Tour de Addo website enquiry (team)',
   to: 'team@redcherryevents.co.za',
-  previewData: { name: 'Sam Rider', email: 'sam@example.com', phone: '082 000 0000', trip: 'Best of Nyati 18–21 August 2027', message: 'Is the Nyati trip OK for a first-timer?', consent: true, receivedAt: '2026-11-12T10:00:00Z' },
+  previewData: { name: 'Sam Rider', email: 'sam@example.com', phone: '082 000 0000', trip: 'Best of Nyathi 18–21 August 2027', message: 'Is the Nyathi trip OK for a first-timer?', consent: true, receivedAt: '2026-11-12T10:00:00Z' },
 } satisfies TemplateEntry

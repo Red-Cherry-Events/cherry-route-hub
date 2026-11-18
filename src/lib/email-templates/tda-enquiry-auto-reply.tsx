@@ -26,7 +26,7 @@ const Email = ({ name, message = '' }: Props) => {
       <Text style={sub}>2027 trips</Text>
       <Text style={row}>Best of Darlington Dam: 22 to 25 April 2027</Text>
       <Text style={row}>Best of Darlington Dam: 26 to 29 April 2027</Text>
-      <Text style={{ ...row, margin: '0 0 16px' }}>Best of Nyati: 18 to 21 August 2027</Text>
+      <Text style={{ ...row, margin: '0 0 16px' }}>Best of Nyathi: 18 to 21 August 2027</Text>
       <Text style={text}>Each tour takes 30 riders, and a R5 000 deposit secures your spot.</Text>
 
       <Section style={{ textAlign: 'center' as const, margin: '8px 0 20px' }}>
@@ -44,5 +44,5 @@ export const template = {
   component: Email,
   subject: 'Thanks for your Tour de Addo question',
   displayName: 'Tour de Addo website enquiry (rider reply)',
-  previewData: { name: 'Sam Rider', message: 'Is the Nyati trip OK for a first-timer?' },
+  previewData: { name: 'Sam Rider', message: 'Is the Nyathi trip OK for a first-timer?' },
 } satisfies TemplateEntry

@@ -16,5 +16,5 @@ describe('Approved Tour de Addo generator', () => {
   it('keeps the approved sold-out branch', () => { assert.deepEqual(trip_state(31, 30), { big: 'Sold out', small: '', foot: '30 of 30 taken &middot; waiting list', pct: 100, open: false, left: 0 }); });
   it('hides book buttons for sold-out trips', () => { assert.equal(two_buttons({ d2: trip_state(30,30), ny: trip_state(40,40) }).includes('<a '), false); });
   it('uses the approved singular subject', () => { assert.equal(build('Shaun', 29, 29, 0)[3][0], '1 spot left on Darlington Trip 2'); });
-  it('uses the approved full Darlington subject', () => { assert.equal(build('Shaun', 30, 30, 1)[3][0], 'Darlington is full. Nyati is still open'); });
+  it('uses the approved full Darlington subject', () => { assert.equal(build('Shaun', 30, 30, 1)[3][0], 'Darlington is full. Nyathi is still open'); });
 });

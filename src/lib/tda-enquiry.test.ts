@@ -38,3 +38,13 @@ describe("Tour de Addo enquiry form", () => {
     assert.deepEqual(tdaListIds(undefined), ["102527", "102600"]);
   });
 });
+
+describe("trip spelling", () => {
+  it("accepts both Nyati and Nyathi, stores Nyathi", () => {
+    for (const trip of ["Best of Nyati 18–21 August 2027", "Best of Nyathi 18–21 August 2027"]) {
+      const r = parseTdaEnquiry({ ...base, trip });
+      assert.equal(r.kind, "ok");
+      if (r.kind === "ok") assert.equal(r.enquiry.trip, "Best of Nyathi 18–21 August 2027");
+    }
+  });
+});

@@ -11,8 +11,11 @@ export const TDA_TRIPS = [
   "Not sure yet",
   "Best of Darlington Dam 22–25 April 2027",
   "Best of Darlington Dam 26–29 April 2027",
-  "Best of Nyati 18–21 August 2027",
+  "Best of Nyathi 18–21 August 2027",
 ] as const;
+
+/** Older website spelling, still accepted and stored as the Nyathi value. */
+const TDA_TRIP_ALIASES: Record<string, string> = { "Best of Nyati 18–21 August 2027": "Best of Nyathi 18–21 August 2027" };
 
 /** Default Everlytic lists: "Enquiry - TDA" and the master "Bicycles" list. */
 export const TDA_DEFAULT_LIST_IDS = ["102527", "102600"];
@@ -44,7 +47,7 @@ export const tdaEnquirySchema = z.object({
   name: z.string({ error: "Please add your name." }).trim().min(1, "Please add your name.").max(120, "Your name is too long."),
   email: z.string({ error: "Please add your email address." }).trim().min(1, "Please add your email address.").max(255, "Your email address is too long.").email("Please check your email address.").transform((v) => v.toLowerCase()),
   phone: optional(40),
-  trip: z.string().trim().optional().transform((v) => v || "Not sure yet").refine((v) => (TDA_TRIPS as readonly string[]).includes(v), "Please pick a trip from the list."),
+  trip: z.string().trim().optional().transform((v) => { const t = v || "Not sure yet"; return TDA_TRIP_ALIASES[t] ?? t; }).refine((v) => (TDA_TRIPS as readonly string[]).includes(v), "Please pick a trip from the list."),
   message: z.string({ error: "Please add your question." }).trim().min(1, "Please add your question.").max(4000, "Your question is too long."),
   consent: z.string().optional().transform((v) => v === "on" || v === "true" || v === "yes"),
 });
