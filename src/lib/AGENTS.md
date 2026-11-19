@@ -2,3 +2,4 @@
 - Partner-website newsletter sign-ups use /api/public/website-signup, gated by a per-site origin allow-list (src/lib/website-signup.ts) and the event's website_url host, sharing processEventInterest with the secret-gated event-interest route so storage, Everlytic sync and confirmations stay identical.
 - The TimelinesAI WhatsApp auto-reply treats the webhook body as a lookup hint only: it re-fetches message and chat from TimelinesAI, dedupes in whatsapp_bot_messages, debounces per chat in whatsapp_bot_chats, runs after the response via wait-until.server (inline fallback), and keeps rules in tested src/lib/timelines-bot.ts.
 - Welcome and schedule-correction emails share RiderOffers from entry-welcome so supplier card styling stays identical.
+- Registered templates may supply trusted source-controlled HTML for exact approved artwork; sending and both previews use it verbatim, never accepting HTML from caller data, while managed sender handling stays unchanged.

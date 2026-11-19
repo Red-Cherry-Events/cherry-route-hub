@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { render } from '@react-email/render'
+import { render, toPlainText } from '@react-email/render'
 import { EmailAPIError, sendLovableEmail } from '@lovable.dev/email-js'
 import { TEMPLATES } from './registry'
 
@@ -58,8 +58,10 @@ export async function sendTemplateEmail(
 
   const templateData = options.templateData ?? {}
   const element = React.createElement(template.component, templateData)
-  const html = await render(element)
-  const text = await render(element, { plainText: true })
+  const html = template.html ?? await render(element)
+  const text = template.html === undefined
+    ? await render(element, { plainText: true })
+    : toPlainText(html)
   const subject =
     typeof template.subject === 'function'
       ? template.subject(templateData)

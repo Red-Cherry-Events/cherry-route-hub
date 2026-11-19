@@ -90,7 +90,7 @@ export async function renderTemplateHtml(name: string): Promise<{ html: string; 
   const template = TEMPLATES[name]
   if (!template) throw new Error(`Unknown email template: ${name}`)
   const data = template.previewData ?? {}
-  const html = await render(React.createElement(template.component, data))
+  const html = template.html ?? await render(React.createElement(template.component, data))
   const subject = typeof template.subject === 'function' ? template.subject(data) : template.subject
   return { html, subject }
 }

@@ -51,7 +51,7 @@ export const Route = createFileRoute("/lovable/email/transactional/preview")({
           }
 
           try {
-            const html = await render(
+            const html = entry.html ?? await render(
               React.createElement(entry.component, entry.previewData)
             )
             const resolvedSubject =

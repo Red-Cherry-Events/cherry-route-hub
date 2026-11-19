@@ -27,6 +27,8 @@ import { ReauthenticationEmail } from './reauthentication'
 
 export interface TemplateEntry {
   component: ComponentType<any>
+  /** Trusted, source-controlled HTML only, never caller-supplied template data. */
+  html?: string
   subject: string | ((data: Record<string, any>) => string)
   displayName?: string
   previewData?: Record<string, any>
