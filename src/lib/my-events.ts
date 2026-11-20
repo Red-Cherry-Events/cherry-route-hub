@@ -10,6 +10,7 @@ export type ExtraItem = {
 
 export type MyEventRow = {
   event_entrant_id: string;
+  entrant_name: string;
   event_id: string;
   category: string | null;
   batch: string | null;
@@ -68,7 +69,7 @@ export async function fetchMyEvents(): Promise<MyEventRow[]> {
   // Only the entrant records linked to this signed-in person (admins included).
   const { data: mine, error: entrantErr } = await supabase
     .from("entrants")
-    .select("id")
+    .select("id, full_name")
     .eq("user_id", uid);
   if (entrantErr) {
     console.warn("[my-events] entrants", entrantErr);
@@ -80,7 +81,7 @@ export async function fetchMyEvents(): Promise<MyEventRow[]> {
   const { data, error } = await supabase
     .from("event_entrants")
     .select(
-      "id, event_id, category, batch, bib_number, registration_ref, jacket_size, tshirt_size, extras, team_name, notes, paid, amount_due_cents, amount_paid_cents, event:events(id, name, discipline, event_date, location, distance_km, status, hero_color, logo_url, description, social_links, title_sponsor_name, title_sponsor_logo_url, title_sponsor_url)",
+      "id, entrant_id, event_id, category, batch, bib_number, registration_ref, jacket_size, tshirt_size, extras, team_name, notes, paid, amount_due_cents, amount_paid_cents, event:events(id, name, discipline, event_date, location, distance_km, status, hero_color, logo_url, description, social_links, title_sponsor_name, title_sponsor_logo_url, title_sponsor_url)",
     )
     .in("entrant_id", entrantIds)
     .order("created_at", { ascending: false });
@@ -92,6 +93,7 @@ export async function fetchMyEvents(): Promise<MyEventRow[]> {
     .filter((r) => r.event)
     .map((r) => ({
       event_entrant_id: r.id,
+      entrant_name: mine?.find(entrant => entrant.id === r.entrant_id)?.full_name ?? "",
       event_id: r.event_id,
       category: r.category,
       batch: r.batch,

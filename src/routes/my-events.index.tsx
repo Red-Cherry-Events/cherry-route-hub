@@ -211,6 +211,7 @@ function EventRow({ r }: { r: any }) {
         </div>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="min-w-0">
+            {r.entrant_name ? <p className="text-sm font-semibold text-ink">{r.entrant_name}</p> : null}
             <p className="text-sm font-semibold text-ink">
               {new Date(r.event.event_date).toLocaleString("en-ZA", {
                 weekday: "short",

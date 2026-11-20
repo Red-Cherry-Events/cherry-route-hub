@@ -10,7 +10,7 @@
 # Roadmap
 
 ## Sabrina Love shared-email family entries (20 Nov)
-- [ ] Keep separate people on one email in imports, restore Denise Brooke's four entries, verify signed-in display and publish.
+- [x] Keep separate people on one email in imports, restore Denise Brooke's four entries and verify all names/distances in the signed-in event list on phone and desktop; publication requested.
 
 ## Website-backed upcoming mailers (Shaun, 17 Nov)
 - [x] Check Otto1890 Weekend Warrior, JBFE Sea to Sea and TDA Nyati website times and entry-opening details; Lourensford website still shows 2026 programme, North dates remain unannounced
