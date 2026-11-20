@@ -177,17 +177,17 @@ export const importRoster = createServerFn({ method: "POST" })
         }
 
         const emailLower = r.email.toLowerCase();
-        // Upsert entrant by email
-        const { data: existing, error: findErr } = await context.supabase
+        const { matchEntrantIdentity } = await import('./entrant-identity');
+        const { data: candidates, error: findErr } = await context.supabase
           .from("entrants")
-          .select("id")
-          .ilike("email", emailLower)
-          .maybeSingle();
+          .select("id, full_name, id_number_hash")
+          .ilike("email", emailLower);
         if (findErr) throw findErr;
+        const existingId = matchEntrantIdentity(candidates ?? [], r.full_name, hashIdNumber(r.id_number));
 
         let entrantId: string;
-        if (existing?.id) {
-          entrantId = existing.id;
+        if (existingId) {
+          entrantId = existingId;
           await context.supabase
             .from("entrants")
             .update({
@@ -367,16 +367,17 @@ export const quickAddEntrant = createServerFn({ method: "POST" })
     const { hashIdNumber, idNumberLast4 } = await import("./id-hash.server");
     const emailLower = data.email.toLowerCase();
 
-    const { data: existing, error: findErr } = await context.supabase
+    const { matchEntrantIdentity } = await import('./entrant-identity');
+    const { data: candidates, error: findErr } = await context.supabase
       .from("entrants")
-      .select("id")
-      .ilike("email", emailLower)
-      .maybeSingle();
+      .select("id, full_name, id_number_hash")
+      .ilike("email", emailLower);
     if (findErr) throw findErr;
+    const existingId = matchEntrantIdentity(candidates ?? [], data.full_name, hashIdNumber(data.id_number));
 
     let entrantId: string;
-    if (existing?.id) {
-      entrantId = existing.id;
+    if (existingId) {
+      entrantId = existingId;
       const { error: upErr } = await context.supabase
         .from("entrants")
         .update({
@@ -455,6 +456,8 @@ export const getMyEntrant = createServerFn({ method: "GET" })
       .from("entrants")
       .select("id, full_name, email, phone, user_id")
       .eq("user_id", context.userId)
+      .order("created_at", { ascending: true })
+      .limit(1)
       .maybeSingle();
     if (error) throw error;
     return data;

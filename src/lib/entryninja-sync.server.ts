@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchEnEvents, fetchEnEntries, normaliseSize, toLineArray, linePrice, extractTeam, type EnEvent } from "./entryninja.server";
 import { ageBandFromSaId, normaliseGender } from "./age-band";
 import { hashIdNumber, idNumberLast4 } from "./id-hash.server";
+import { matchEntrantIdentity } from "./entrant-identity";
 
 // The generated Database type isn't needed here; the callers pass typed clients.
 type AnyClient = SupabaseClient<any, any, any>;
@@ -134,11 +135,11 @@ export async function syncEnEvent(
       if (!existingId && email) {
         const { data: byEmail, error: findErr } = await supabase
           .from("entrants")
-          .select("id")
+          .select("id, full_name, id_number_hash")
           .ilike("email", email)
-          .maybeSingle();
+          ;
         if (findErr) throw findErr;
-        existingId = byEmail?.id ?? null;
+        existingId = matchEntrantIdentity(byEmail ?? [], fullName, idHash);
       }
 
       const entrantPayload = {

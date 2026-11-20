@@ -139,10 +139,10 @@ export async function syncMyEntries(args: {
         entrantId = data?.id ?? null;
       }
       if (!entrantId && entEmail) {
-        const { data } = await admin.from("entrants").select("id").ilike("email", entEmail).maybeSingle();
-        entrantId = data?.id ?? null;
+        const { matchEntrantIdentity } = await import('./entrant-identity');
+        const { data } = await admin.from("entrants").select("id, full_name, id_number_hash").ilike("email", entEmail);
+        entrantId = matchEntrantIdentity(data ?? [], fullName, entIdHash);
       }
-      if (!entrantId && entrantIds.length) entrantId = entrantIds[0] ?? null;
 
       const payload = {
         full_name: fullName,
