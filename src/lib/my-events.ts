@@ -118,9 +118,9 @@ export async function fetchMyEvents(): Promise<MyEventRow[]> {
   });
 }
 
-export async function fetchMyEventById(eventId: string): Promise<MyEventRow | null> {
+export async function fetchMyEventById(eventId: string, entryId?: string): Promise<MyEventRow | null> {
   const rows = await fetchMyEvents();
-  return rows.find((r) => r.event_id === eventId) ?? null;
+  return rows.find((r) => r.event_id === eventId && (!entryId || r.event_entrant_id === entryId)) ?? null;
 }
 
 

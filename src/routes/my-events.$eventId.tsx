@@ -166,8 +166,9 @@ type Tab = (typeof EVENT_TABS)[number];
 export const Route = createFileRoute("/my-events/$eventId")({
   // ?tab=village lets shared links (e.g. the embeddable village map) deep-link
   // straight onto a tab inside the app.
-  validateSearch: (search: Record<string, unknown>): { tab?: Tab } => ({
+  validateSearch: (search: Record<string, unknown>): { tab?: Tab; entry?: string } => ({
     tab: EVENT_TABS.includes(search.tab as Tab) ? (search.tab as Tab) : undefined,
+    entry: typeof search.entry === 'string' ? search.entry : undefined,
   }),
   loader: async ({ params }) => {
     const { data, error } = await supabase
@@ -2513,10 +2514,11 @@ function YourEntryCard({
   apparel?: ApparelFlags;
 }) {
   const { user, loading: sessionLoading } = useSession();
+  const { entry } = Route.useSearch();
   const signedIn = Boolean(user);
   const q = useQuery({
-    queryKey: ["my-entry", eventId],
-    queryFn: () => fetchMyEventById(eventId),
+    queryKey: ["my-entry", eventId, entry],
+    queryFn: () => fetchMyEventById(eventId, entry),
     staleTime: 30_000,
     enabled: signedIn,
   });

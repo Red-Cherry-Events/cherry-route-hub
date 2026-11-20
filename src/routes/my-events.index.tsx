@@ -193,6 +193,7 @@ function EventRow({ r }: { r: any }) {
       <Link
         to="/my-events/$eventId"
         params={{ eventId: r.event_id }}
+        search={{ entry: r.event_entrant_id }}
         className="block overflow-hidden rounded-2xl bg-card ring-1 ring-border active:scale-[0.99] transition-transform"
       >
         <div
