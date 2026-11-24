@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Button, Column, Heading, Img, Link, Row, Section, Text } from '@react-email/components'
 
 import type { TemplateEntry } from './registry'
+import { KcaMatchBand } from './sabrina-love-brand'
 import { EmailShell, brand, button, footer, h1, link, text } from './theme'
 
 export interface EntryWelcomeProps {
@@ -455,6 +456,8 @@ export const EntryWelcomeEmail = ({
         Open {eventName}
       </Link>
     </Text>
+
+    {/sabrina love/i.test(eventName) ? <KcaMatchBand entered /> : null}
 
     <RiderOffers offers={offers} eventName={eventName} />
 

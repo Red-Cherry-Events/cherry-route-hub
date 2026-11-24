@@ -49,7 +49,7 @@ export function SlscHeader({ dayLabel, photoUrl, photoAlt }: { dayLabel: string;
   </>
 }
 
-export function KcaMatchBand({ entryUrl }: { entryUrl: string }) {
+export function KcaMatchBand({ entryUrl, entered = false }: { entryUrl?: string; entered?: boolean }) {
   return <Section style={{ backgroundColor: sl.white, border: `2px solid ${sl.pink}`, padding: '24px 22px', margin: '12px 0 24px', borderRadius: '12px' }}>
     <Img src={absolute(kcaLogo.url)} alt="Keep a Child Alive" width="110" style={{ width: '110px', height: 'auto', display: 'block', margin: '0 0 14px' }} />
     <Text style={{ ...sl.label }}>♥ EVERY ENTRY &amp; DONATION MATCHED BY KCA</Text>
@@ -59,15 +59,18 @@ export function KcaMatchBand({ entryUrl }: { entryUrl: string }) {
     <Text style={{ ...sl.text }}>
       Keep A Child Alive (KCA) will match every Summer Challenge entry and every donation, rand for rand. Whether you paddle, walk, run or ride, your support goes twice as far for children with disabilities and their families in Plettenberg Bay and the Bitou region.
     </Text>
+    {entered ? <Text style={{ ...sl.text }}>
+      Your entry has already been matched. Want to go further? Share your entry with friends and family, or make a donation and KCA will match that too.
+    </Text> : null}
     <Text style={{ ...sl.text, fontWeight: 700, color: sl.pink }}>♥ Let's raise a million!</Text>
-    <Row style={{ margin: '6px 0 4px' }}>
+    {entered || !entryUrl ? <Button href={SLSC_GIVENGAIN} style={{ ...sl.button, display: 'block', textAlign: 'center' }}>Donate ♥</Button> : <Row style={{ margin: '6px 0 4px' }}>
       <Column style={{ paddingRight: '6px' }}>
         <Button href={entryUrl} style={{ ...sl.button, display: 'block', textAlign: 'center' }}>Enter now</Button>
       </Column>
       <Column style={{ paddingLeft: '6px' }}>
         <Button href={SLSC_GIVENGAIN} style={{ ...sl.buttonGhost, display: 'block', textAlign: 'center' }}>Donate ♥</Button>
       </Column>
-    </Row>
+    </Row>}
     <Text style={{ ...sl.text, fontSize: '13px', color: sl.muted, margin: '12px 0 0' }}>
       Find out more about <Link href={KCA_URL} style={{ color: sl.pink }}>Keep a Child Alive</Link>.
     </Text>
