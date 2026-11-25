@@ -30,7 +30,7 @@ describe("Sabrina Love approved KCA campaign", () => {
     const html = renderToStaticMarkup(<SlscKcaCard entryUrl={ENTRY_URL} />);
     assert.match(html, new RegExp(`href="${ENTRY_URL}"`));
     assert.match(html, /data-track-action="slsc_entry_donation_opened"/);
-    assert.match(html, /href="https:\/\/www\.givengain\.com\/cc\/sabrinalove"/);
+    assert.match(html, /href="https:\/\/www\.givengain\.com\/event\/show-sabrina-love-and-kca-will-match-it-11408"/);
   });
 
   it("shows only the R1m goal until an admin enters a real raised figure", () => {

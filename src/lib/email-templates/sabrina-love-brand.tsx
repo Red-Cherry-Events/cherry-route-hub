@@ -30,7 +30,7 @@ export const sl = {
 }
 
 export const SLSC_SITE = 'https://sabrinalove.co.za/summer-challenge-2026/'
-export const SLSC_GIVENGAIN = 'https://www.givengain.com/cc/sabrinalove'
+export const SLSC_GIVENGAIN = 'https://www.givengain.com/event/show-sabrina-love-and-kca-will-match-it-11408'
 export const SLSC_WHATSAPP = 'https://wa.me/27788038978'
 
 export function SlscHeader({ dayLabel, photoUrl, photoAlt }: { dayLabel: string; photoUrl: string; photoAlt: string }) {

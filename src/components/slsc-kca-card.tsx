@@ -8,7 +8,7 @@ import { useAdminStore } from "@/lib/store";
 const SLSC_GRADIENT = "linear-gradient(135deg, #A3005A 0%, #E6007E 52%, #FF3D9A 100%)";
 const SLSC_PINK = "#E6007E";
 const SUN_YELLOW = "#FFC83D";
-const GIVENGAIN_URL = "https://www.givengain.com/cc/sabrinalove";
+const GIVENGAIN_URL = "https://www.givengain.com/event/show-sabrina-love-and-kca-will-match-it-11408";
 
 /** Sabrina Love Summer Challenge events get the approved KCA matching campaign. */
 export function isSabrinaLoveEvent(name?: string | null) {
