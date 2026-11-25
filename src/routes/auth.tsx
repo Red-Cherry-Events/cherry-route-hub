@@ -23,6 +23,7 @@ const searchSchema = z.object({
   add: z.boolean().optional(),
   deleted: z.boolean().optional(),
   disconnectApple: z.boolean().optional(),
+  watch: z.string().optional(),
 });
 
 
@@ -121,7 +122,7 @@ type Mode = "signin" | "signup" | "reset";
 
 function AuthPage() {
   const { user, loading } = useSession();
-  const { next, email: emailParam, add, deleted, disconnectApple } = Route.useSearch();
+  const { next, email: emailParam, add, deleted, disconnectApple, watch } = Route.useSearch();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -344,6 +345,11 @@ function AuthPage() {
           </h1>
         </div>
 
+        {watch === "ice" ? (
+          <p className="mt-4 rounded-2xl bg-accent/60 p-3 text-center text-sm font-semibold text-ink ring-1 ring-border">
+            Create a free account to watch Inner City Enduro live: the live stream, who's in and who's out, and the rider map.
+          </p>
+        ) : null}
         {deleted ? <p role="status" className="mt-4 rounded-lg bg-accent p-3 text-sm text-foreground">Your account has been deleted.</p> : null}
         {deleted && disconnectApple ? <AppleDisconnect /> : null}
         {isSignup ? (

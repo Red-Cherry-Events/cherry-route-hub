@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BedDouble, Bot, Boxes, CalendarDays, ClipboardList, GraduationCap, HardHat, Map as MapIcon, MapPin, Search, Siren, Users } from "lucide-react";
 import { useIsAdmin, useIsCrew } from "@/lib/auth";
+import { Trophy } from "lucide-react";
+import { ICE_EVENT_ID } from "@/lib/ice-knockout";
 import { ShieldCheck, ChevronRight } from "lucide-react";
 import { fetchAllCrewEvents, fetchCrewEvents, fetchCrewRooming, normaliseTent } from "@/lib/crew";
 import { buildCrewTimeline, groupScheduleByDay, pickCurrentDay } from "@/lib/crew-plan";
@@ -271,6 +273,14 @@ function CrewDashboard() {
       </section>
       ) : (
       <section className="grid gap-2 sm:grid-cols-2">
+        {events.some((e) => e.id === ICE_EVENT_ID) ? (
+          <Tile
+            to="/crew/ice-knockout"
+            icon={<Trophy className="h-5 w-5" />}
+            title="ICE knockout tracker"
+            body="Mark Pro and Support riders in or out after each heat. Updates the event page live."
+          />
+        ) : null}
         <Tile
           to="/crew/tracking"
           icon={<Siren className="h-5 w-5" />}

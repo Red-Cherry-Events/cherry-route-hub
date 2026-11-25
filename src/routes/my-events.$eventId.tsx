@@ -70,6 +70,7 @@ import { RouteMap } from "@/components/route-map";
 import { downloadBlob } from "@/lib/route-files";
 import { RouteFileStats } from "@/components/route-file-stats";
 import { RouteProfile } from "@/components/route-profile";
+import { IceKnockoutBoard, IceRaceDayLive } from "@/components/ice-race-day";
 
 /** Long text collapsed to a few lines with a Read more / Show less toggle. */
 function ReadMoreText({ text, className, buttonClassName }: { text: string; className?: string; buttonClassName?: string }) {
@@ -143,23 +144,6 @@ function iceTabRank(id: string): number {
   return i === -1 ? 10 : i;
 }
 
-function IceLiveStreamCard() {
-  return (
-    <section data-section="live_stream">
-      <SectionTitle>Watch the live stream</SectionTitle>
-      <div className="mt-2 rounded-2xl bg-ink p-4 text-primary-foreground ring-1 ring-border">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cherry">
-          <Radio className="h-3.5 w-3.5" /> Live on Sunday
-        </p>
-        <p className="mt-1 font-display text-lg font-bold">The main race, streamed live</p>
-        <p className="mt-1 text-sm opacity-80">
-          We are streaming the Inner City Enduro main race on Sunday 29 November from 09:00. Watch it right here, wherever you are.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 const EVENT_TABS = ["info", "village", "routes", "results", "news", "photos", "chat", "ask", "packing", "sponsors", "accommodation"] as const;
 type Tab = (typeof EVENT_TABS)[number];
 
@@ -228,7 +212,19 @@ function MyEventDetail() {
   useEffect(() => {
     if (!event) void router.invalidate();
   }, [event, router]);
+  const { user, loading } = useSession();
+  const ice = Boolean(event && isIceEvent(event.name));
+  const goAuth = useNavigate();
+  const sentRef = useRef(false);
+  useEffect(() => {
+    // ICE race-day viewing is for signed-in accounts: send visitors to sign in, then back here.
+    if (!ice || loading || user || sentRef.current) return;
+    if (!window.location.pathname.startsWith("/my-events/")) return;
+    sentRef.current = true;
+    void goAuth({ to: "/auth", search: { next: window.location.pathname + window.location.search, watch: "ice" }, replace: true });
+  }, [ice, loading, user, goAuth]);
   if (!event) return <div className="p-8 text-center text-sm text-ink-soft">Loading event…</div>;
+  if (ice && !user) return <div className="p-8 text-center text-sm text-ink-soft">Create a free account to watch Inner City Enduro live…</div>;
   return <MyEventDetailInner event={event} />;
 }
 
@@ -437,13 +433,14 @@ function MyEventDetailInner({ event }: { event: NonNullable<ReturnType<typeof Ro
       <div className="px-5 py-4">
         {tab === "info" && (
           <div ref={infoRef} className="space-y-5">
+            {isIceEvent(event.name) && user ? <IceRaceDayLive eventId={event.id} onOpenMap={() => selectTab("village", "quick_link")} /> : null}
             <section data-section="assistant">
               <SectionTitle>Ask the assistant</SectionTitle>
               <div className="mt-2">
                 <AskAdminPanel eventId={event.id} userId={user?.id ?? null} eventName={event.name} compact />
               </div>
             </section>
-            {isIceEvent(event.name) ? <IceLiveStreamCard /> : null}
+            {isIceEvent(event.name) && user ? <IceKnockoutBoard eventId={event.id} /> : null}
             <InfoPanel eventId={event.id} description={event.description} distanceKm={event.distance_km} event={event} isLive={event.status === "live"} eventName={event.name} onTabChange={(t) => selectTab(t, "quick_link")} hasFreshNews={hasFreshNews} hasNightly={hasNightly} signedIn={Boolean(user)} />
           </div>
         )}

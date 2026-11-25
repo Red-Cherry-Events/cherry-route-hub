@@ -1556,6 +1556,32 @@ export type Database = {
           },
         ]
       }
+      event_live_streams: {
+        Row: {
+          event_id: string
+          updated_at: string
+          youtube_url: string | null
+        }
+        Insert: {
+          event_id: string
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          event_id?: string
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_live_streams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_logistics_runs: {
         Row: {
           created_at: string
@@ -2680,6 +2706,59 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      ice_knockout_riders: {
+        Row: {
+          bib_number: string | null
+          created_at: string
+          event_entrant_id: string | null
+          event_id: string
+          full_name: string
+          id: string
+          out_at: string | null
+          out_round: string | null
+          race_class: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bib_number?: string | null
+          created_at?: string
+          event_entrant_id?: string | null
+          event_id: string
+          full_name: string
+          id?: string
+          out_at?: string | null
+          out_round?: string | null
+          race_class: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bib_number?: string | null
+          created_at?: string
+          event_entrant_id?: string | null
+          event_id?: string
+          full_name?: string
+          id?: string
+          out_at?: string | null
+          out_round?: string | null
+          race_class?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ice_knockout_riders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       id_lookup_attempts: {
         Row: {
@@ -4563,6 +4642,7 @@ export type Database = {
         Args: { _event_id?: string; _since: string }
         Returns: Json
       }
+      is_crew_or_admin: { Args: never; Returns: boolean }
       live_tracking_identity: {
         Args: { _event_id: string }
         Returns: {
@@ -4643,6 +4723,7 @@ export type Database = {
         Args: { _email: string; _name: string; _source: string }
         Returns: string
       }
+      tidy_rider_name: { Args: { _name: string }; Returns: string }
       verify_cron_key: { Args: { _key: string }; Returns: boolean }
     }
     Enums: {

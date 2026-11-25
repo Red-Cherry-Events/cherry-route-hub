@@ -65,6 +65,7 @@ import { Route as AdminWebsiteEnquiriesRouteImport } from './routes/admin.websit
 import { Route as AskEventIdRouteImport } from './routes/ask.$eventId'
 import { Route as CrewIndexRouteImport } from './routes/crew.index'
 import { Route as CrewBuildRouteImport } from './routes/crew.build'
+import { Route as CrewIceKnockoutRouteImport } from './routes/crew.ice-knockout'
 import { Route as CrewInventoryRouteImport } from './routes/crew.inventory'
 import { Route as CrewLoginRouteImport } from './routes/crew.login'
 import { Route as CrewRentalsRouteImport } from './routes/crew.rentals'
@@ -424,6 +425,11 @@ const CrewIndexRoute = CrewIndexRouteImport.update({
 const CrewBuildRoute = CrewBuildRouteImport.update({
   id: '/crew/build',
   path: '/crew/build',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrewIceKnockoutRoute = CrewIceKnockoutRouteImport.update({
+  id: '/crew/ice-knockout',
+  path: '/crew/ice-knockout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CrewInventoryRoute = CrewInventoryRouteImport.update({
@@ -891,6 +897,7 @@ export interface FileRoutesByFullPath {
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
   '/crew/build': typeof CrewBuildRoute
+  '/crew/ice-knockout': typeof CrewIceKnockoutRoute
   '/crew/inventory': typeof CrewInventoryRoute
   '/crew/login': typeof CrewLoginRoute
   '/crew/rentals': typeof CrewRentalsRoute
@@ -1023,6 +1030,7 @@ export interface FileRoutesByTo {
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
   '/crew/build': typeof CrewBuildRoute
+  '/crew/ice-knockout': typeof CrewIceKnockoutRoute
   '/crew/inventory': typeof CrewInventoryRoute
   '/crew/login': typeof CrewLoginRoute
   '/crew/rentals': typeof CrewRentalsRoute
@@ -1158,6 +1166,7 @@ export interface FileRoutesById {
   '/admin/website-enquiries': typeof AdminWebsiteEnquiriesRoute
   '/ask/$eventId': typeof AskEventIdRoute
   '/crew/build': typeof CrewBuildRoute
+  '/crew/ice-knockout': typeof CrewIceKnockoutRoute
   '/crew/inventory': typeof CrewInventoryRoute
   '/crew/login': typeof CrewLoginRoute
   '/crew/rentals': typeof CrewRentalsRoute
@@ -1295,6 +1304,7 @@ export interface FileRouteTypes {
     | '/admin/website-enquiries'
     | '/ask/$eventId'
     | '/crew/build'
+    | '/crew/ice-knockout'
     | '/crew/inventory'
     | '/crew/login'
     | '/crew/rentals'
@@ -1427,6 +1437,7 @@ export interface FileRouteTypes {
     | '/admin/website-enquiries'
     | '/ask/$eventId'
     | '/crew/build'
+    | '/crew/ice-knockout'
     | '/crew/inventory'
     | '/crew/login'
     | '/crew/rentals'
@@ -1561,6 +1572,7 @@ export interface FileRouteTypes {
     | '/admin/website-enquiries'
     | '/ask/$eventId'
     | '/crew/build'
+    | '/crew/ice-knockout'
     | '/crew/inventory'
     | '/crew/login'
     | '/crew/rentals'
@@ -1665,6 +1677,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AskEventIdRoute: typeof AskEventIdRoute
   CrewBuildRoute: typeof CrewBuildRoute
+  CrewIceKnockoutRoute: typeof CrewIceKnockoutRoute
   CrewInventoryRoute: typeof CrewInventoryRoute
   CrewLoginRoute: typeof CrewLoginRoute
   CrewRentalsRoute: typeof CrewRentalsRoute
@@ -2121,6 +2134,13 @@ declare module '@tanstack/react-router' {
       path: '/crew/build'
       fullPath: '/crew/build'
       preLoaderRoute: typeof CrewBuildRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crew/ice-knockout': {
+      id: '/crew/ice-knockout'
+      path: '/crew/ice-knockout'
+      fullPath: '/crew/ice-knockout'
+      preLoaderRoute: typeof CrewIceKnockoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/crew/inventory': {
@@ -2835,6 +2855,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AskEventIdRoute: AskEventIdRoute,
   CrewBuildRoute: CrewBuildRoute,
+  CrewIceKnockoutRoute: CrewIceKnockoutRoute,
   CrewInventoryRoute: CrewInventoryRoute,
   CrewLoginRoute: CrewLoginRoute,
   CrewRentalsRoute: CrewRentalsRoute,
