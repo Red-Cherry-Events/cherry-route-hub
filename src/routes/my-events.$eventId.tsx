@@ -24,6 +24,8 @@ import ReactMarkdown from "react-markdown";
 import { createFileRoute, Link, notFound, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { trackAction, trackActionThrottled, useClickTracking, useSectionTracking, useTabTracking, type TabSource } from "@/lib/event-analytics";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { reportChatMessage } from "@/lib/chat-moderation.functions";
 import { askEventBot } from "@/lib/event-bot.functions";
 import { fetchEventSponsors } from "@/lib/event-sponsors.functions";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -1658,6 +1660,21 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
   const [shareWa, setShareWa] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const [menuFor, setMenuFor] = useState<any | null>(null);
+  const [reportFor, setReportFor] = useState<any | null>(null);
+  const [reason, setReason] = useState("");
+  const [showRules, setShowRules] = useState(false);
+  const reportFn = useServerFn(reportChatMessage);
+  const rulesKey = userId ? `rch-chat-rules-ok:${userId}` : "";
+
+  const blocksQ = useQuery({
+    queryKey: ["user-blocks", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_blocks").select("blocked_id");
+      return new Set((data ?? []).map((b) => b.blocked_id));
+    },
+  });
 
   const q = useQuery({
     queryKey: ["event-chat", eventId],
@@ -1665,7 +1682,7 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
     queryFn: async () => {
       const { data, error } = await supabase
         .from("event_chat_messages")
-        .select("id, event_id, author_id, body, created_at, pinned, share_whatsapp, profiles:profiles(full_name)")
+        .select("id, event_id, author_id, body, created_at, pinned, share_whatsapp, hidden, profiles:profiles(full_name)")
         .eq("event_id", eventId)
         .order("created_at", { ascending: false })
         .limit(300);
@@ -1696,6 +1713,10 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
 
   async function send() {
     if (!text.trim() || !userId) return;
+    if (!localStorage.getItem(rulesKey)) {
+      setShowRules(true);
+      return;
+    }
     setBusy(true);
     setErr(null);
     const body = text.trim();
@@ -1716,6 +1737,28 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
     qc.invalidateQueries({ queryKey: ["event-chat", eventId] });
   }
 
+  async function submitReport() {
+    if (!reportFor) return;
+    try {
+      await reportFn({ data: { messageId: reportFor.id, reason: reason.trim() || undefined } });
+      toast.success("Thanks, the team will review this message.");
+    } catch {
+      toast.error("Couldn't send the report. Please try again.");
+    }
+    setReportFor(null);
+    setReason("");
+  }
+
+  async function blockRider(m: any) {
+    if (!userId) return;
+    setMenuFor(null);
+    if (!confirm(`Block ${m.profiles?.full_name ?? "this rider"}? You won't see their chat messages. You can unblock them from your profile.`)) return;
+    const { error } = await supabase.from("user_blocks").insert({ blocker_id: userId, blocked_id: m.author_id });
+    if (error && error.code !== "23505") toast.error("Couldn't block this rider.");
+    else toast.success("Rider blocked.");
+    qc.invalidateQueries({ queryKey: ["user-blocks", userId] });
+  }
+
   async function openWhatsApp(id: string) {
     const { data } = await supabase.rpc("chat_author_whatsapp", { _message_id: id });
     if (data) window.open(waLink(String(data)), "_blank", "noopener");
@@ -1729,7 +1772,7 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
         <li>Only signed-in, entered riders can read and post.</li>
         <li>Messages stay here for good — tick <b>Pin to board</b> to keep a post at the top (great for lifts, bike racks or sharing accommodation).</li>
         <li>Tap a rider's name to WhatsApp them directly, if they allowed it on their post.</li>
-        <li>Be kind — you can delete your own messages anytime.</li>
+        <li>Be kind. You can delete your own messages anytime, and tap ⋯ on any message to report it or block the rider.</li>
       </ul>
     </div>
   );
@@ -1745,8 +1788,21 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
     );
   }
 
-  const all = (q.data ?? []) as any[];
+  const blocked = blocksQ.data ?? new Set<string>();
+  const all = ((q.data ?? []) as any[]).filter((m) => !m.hidden && !blocked.has(m.author_id));
   const pinned = all.filter((m) => m.pinned);
+
+  function MoreBtn({ m }: { m: any }) {
+    return (
+      <button
+        onClick={() => setMenuFor(m)}
+        aria-label="Message options"
+        className="ml-auto px-1 text-xs leading-none text-ink-soft"
+      >
+        ⋯
+      </button>
+    );
+  }
 
   function Name({ m, mine }: { m: any; mine: boolean }) {
     const name = mine ? "You" : m.profiles?.full_name ?? "Rider";
@@ -1775,10 +1831,12 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
                 <li key={m.id} className="rounded-xl bg-secondary px-3 py-2 text-sm text-ink">
                   <div className="flex items-center justify-between gap-2">
                     <Name m={m} mine={mine} />
-                    {mine && (
+                    {mine ? (
                       <button onClick={() => void remove(m.id)} className="text-[10px] text-ink-soft underline">
                         Delete
                       </button>
+                    ) : (
+                      <MoreBtn m={m} />
                     )}
                   </div>
                   <p className="whitespace-pre-line">{m.body}</p>
@@ -1810,7 +1868,10 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
                       mine ? "ml-auto bg-cherry text-white" : "bg-secondary text-ink"
                     }`}
                   >
-                    <Name m={m} mine={mine} />
+                    <div className="flex items-center gap-2">
+                      <Name m={m} mine={mine} />
+                      {!mine && <MoreBtn m={m} />}
+                    </div>
                     <p className="whitespace-pre-line">
                       {m.pinned ? "📌 " : ""}
                       {m.body}
@@ -1860,6 +1921,76 @@ function ChatPanel({ eventId, userId }: { eventId: string; userId: string | null
           </div>
         </div>
       </div>
+      {menuFor && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center" onClick={() => setMenuFor(null)}>
+          <div className="w-full max-w-sm space-y-1 rounded-2xl bg-card p-2 ring-1 ring-border" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="w-full rounded-xl px-3 py-3 text-left text-sm font-semibold text-ink hover:bg-secondary"
+              onClick={() => {
+                setReportFor(menuFor);
+                setMenuFor(null);
+              }}
+            >
+              Report message
+            </button>
+            <button
+              className="w-full rounded-xl px-3 py-3 text-left text-sm font-semibold text-cherry hover:bg-secondary"
+              onClick={() => void blockRider(menuFor)}
+            >
+              Block this rider
+            </button>
+            <button className="w-full rounded-xl px-3 py-3 text-left text-sm text-ink-soft hover:bg-secondary" onClick={() => setMenuFor(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {reportFor && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center" onClick={() => setReportFor(null)}>
+          <div className="w-full max-w-sm space-y-3 rounded-2xl bg-card p-4 ring-1 ring-border" onClick={(e) => e.stopPropagation()}>
+            <p className="font-display text-sm font-bold text-ink">Report this message</p>
+            <p className="rounded-xl bg-secondary px-3 py-2 text-xs text-ink-soft line-clamp-3">{reportFor.body}</p>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              maxLength={500}
+              rows={3}
+              placeholder="What's wrong with it? (optional)"
+              className="w-full rounded-lg bg-background px-3 py-2 text-sm ring-1 ring-border focus:outline-none focus:ring-cherry"
+            />
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setReportFor(null)} className="rounded-full px-4 py-2 text-sm text-ink-soft">
+                Cancel
+              </button>
+              <button onClick={() => void submitReport()} className="rounded-full cherry-gradient px-4 py-2 text-sm font-semibold text-white">
+                Send report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showRules && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center">
+          <div className="w-full max-w-sm space-y-3 rounded-2xl bg-card p-4 ring-1 ring-border">
+            <p className="font-display text-sm font-bold text-ink">Chat rules</p>
+            <p className="text-sm text-ink">
+              Be respectful. Abusive or objectionable posts are removed and the account may be blocked.
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  localStorage.setItem(rulesKey, "1");
+                  setShowRules(false);
+                  void send();
+                }}
+                className="rounded-full cherry-gradient px-5 py-2 text-sm font-semibold text-white"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

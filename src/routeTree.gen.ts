@@ -33,6 +33,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBotLogRouteImport } from './routes/admin.bot-log'
+import { Route as AdminChatReportsRouteImport } from './routes/admin.chat-reports'
 import { Route as AdminCrewRouteImport } from './routes/admin.crew'
 import { Route as AdminEmailContentRouteImport } from './routes/admin.email-content'
 import { Route as AdminEmailWorkflowsRouteImport } from './routes/admin.email-workflows'
@@ -266,6 +267,11 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
 const AdminBotLogRoute = AdminBotLogRouteImport.update({
   id: '/bot-log',
   path: '/bot-log',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminChatReportsRoute = AdminChatReportsRouteImport.update({
+  id: '/chat-reports',
+  path: '/chat-reports',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCrewRoute = AdminCrewRouteImport.update({
@@ -872,6 +878,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bot-log': typeof AdminBotLogRoute
+  '/admin/chat-reports': typeof AdminChatReportsRoute
   '/admin/crew': typeof AdminCrewRoute
   '/admin/email-content': typeof AdminEmailContentRoute
   '/admin/email-workflows': typeof AdminEmailWorkflowsRoute
@@ -1006,6 +1013,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bot-log': typeof AdminBotLogRoute
+  '/admin/chat-reports': typeof AdminChatReportsRoute
   '/admin/crew': typeof AdminCrewRoute
   '/admin/email-content': typeof AdminEmailContentRoute
   '/admin/email-workflows': typeof AdminEmailWorkflowsRoute
@@ -1143,6 +1151,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bot-log': typeof AdminBotLogRoute
+  '/admin/chat-reports': typeof AdminChatReportsRoute
   '/admin/crew': typeof AdminCrewRoute
   '/admin/email-content': typeof AdminEmailContentRoute
   '/admin/email-workflows': typeof AdminEmailWorkflowsRoute
@@ -1282,6 +1291,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/bot-log'
+    | '/admin/chat-reports'
     | '/admin/crew'
     | '/admin/email-content'
     | '/admin/email-workflows'
@@ -1416,6 +1426,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/bot-log'
+    | '/admin/chat-reports'
     | '/admin/crew'
     | '/admin/email-content'
     | '/admin/email-workflows'
@@ -1552,6 +1563,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/bot-log'
+    | '/admin/chat-reports'
     | '/admin/crew'
     | '/admin/email-content'
     | '/admin/email-workflows'
@@ -1923,6 +1935,13 @@ declare module '@tanstack/react-router' {
       path: '/bot-log'
       fullPath: '/admin/bot-log'
       preLoaderRoute: typeof AdminBotLogRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/chat-reports': {
+      id: '/admin/chat-reports'
+      path: '/chat-reports'
+      fullPath: '/admin/chat-reports'
+      preLoaderRoute: typeof AdminChatReportsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/crew': {
@@ -2721,6 +2740,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBotLogRoute: typeof AdminBotLogRoute
+  AdminChatReportsRoute: typeof AdminChatReportsRoute
   AdminCrewRoute: typeof AdminCrewRoute
   AdminEmailContentRoute: typeof AdminEmailContentRoute
   AdminEmailWorkflowsRoute: typeof AdminEmailWorkflowsRoute
@@ -2765,6 +2785,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBotLogRoute: AdminBotLogRoute,
+  AdminChatReportsRoute: AdminChatReportsRoute,
   AdminCrewRoute: AdminCrewRoute,
   AdminEmailContentRoute: AdminEmailContentRoute,
   AdminEmailWorkflowsRoute: AdminEmailWorkflowsRoute,

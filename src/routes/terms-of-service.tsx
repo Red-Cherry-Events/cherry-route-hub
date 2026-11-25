@@ -45,6 +45,9 @@ function TermsPage() {
       <LegalSection title="Acceptable use">
         <p>Don't misuse the app: no false SOS alerts, no attempts to access other people's information, and no interfering with how it works.</p>
       </LegalSection>
+      <LegalSection title="Community rules">
+        <p>Be respectful in event chats and anywhere else you post. We have zero tolerance for abusive or objectionable content: offending posts are removed and the account may be blocked. Tap ⋯ on any chat message to report it or block the rider. We review reports and act on them.</p>
+      </LegalSection>
       <LegalSection title="Liability">
         <p>The app is provided as is. To the extent the law allows, Red Cherry Events is not liable for losses arising from using or being unable to use the app. Taking part in events is covered by each event's own indemnity.</p>
       </LegalSection>

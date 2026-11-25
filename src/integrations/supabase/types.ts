@@ -263,6 +263,57 @@ export type Database = {
           },
         ]
       }
+      chat_reports: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          message_id: string
+          reason: string | null
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          message_id: string
+          reason?: string | null
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          message_id?: string
+          reason?: string | null
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_reports_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_reports_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "event_chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_audit_resolutions: {
         Row: {
           area: string | null
@@ -985,6 +1036,9 @@ export type Database = {
           body: string
           created_at: string
           event_id: string
+          hidden: boolean
+          hidden_at: string | null
+          hidden_by: string | null
           id: string
           pinned: boolean
           share_whatsapp: boolean
@@ -994,6 +1048,9 @@ export type Database = {
           body: string
           created_at?: string
           event_id: string
+          hidden?: boolean
+          hidden_at?: string | null
+          hidden_by?: string | null
           id?: string
           pinned?: boolean
           share_whatsapp?: boolean
@@ -1003,6 +1060,9 @@ export type Database = {
           body?: string
           created_at?: string
           event_id?: string
+          hidden?: boolean
+          hidden_at?: string | null
+          hidden_by?: string | null
           id?: string
           pinned?: boolean
           share_whatsapp?: boolean
@@ -4458,6 +4518,24 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -4702,6 +4780,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      mask_profanity: { Args: { _body: string }; Returns: string }
       my_entry_group: {
         Args: { _event_id: string }
         Returns: {

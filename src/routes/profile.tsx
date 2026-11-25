@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { trackAction, useSectionTracking, useClickTracking } from "@/lib/event-analytics";
 import { PageHeader } from "@/components/ui-bits";
 import { supabase } from "@/integrations/supabase/client";
+import { BlockedRidersCard } from "@/components/blocked-riders-card";
 import { useSession, signOut, useIsCrew, useIsAdmin } from "@/lib/auth";
 import { LogOut, Save, User as UserIcon, ShieldAlert, ShieldCheck, HardHat, Repeat, Plus, X } from "lucide-react";
 import { NotificationSettings } from "@/components/notification-settings";
@@ -211,6 +212,8 @@ function Profile() {
       <div data-section="rewards"><RewardsSummary /></div>
 
       <div data-section="starred_riders"><StarredRidersCard /></div>
+
+      <BlockedRidersCard userId={user.id} />
 
 
 

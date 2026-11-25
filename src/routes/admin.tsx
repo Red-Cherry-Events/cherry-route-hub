@@ -65,6 +65,7 @@ const navGroups: NavGroup[] = [
     section: "Comms",
     items: [
       { to: "/admin/messages", label: "Messages", icon: MessagesSquare },
+      { to: "/admin/chat-reports", label: "Chat reports", icon: MessagesSquare },
       { to: "/admin/notifications", label: "Notifications", icon: BellRing },
       { to: "/admin/feed", label: "News feed", icon: Newspaper },
       { to: "/admin/social", label: "Social feeds", icon: Instagram },
