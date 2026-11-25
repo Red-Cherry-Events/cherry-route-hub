@@ -6,3 +6,5 @@
 - Entrant email is a household contact, not a unique person: import paths use entrant-identity to reject conflicting IDs and match only unambiguous names, preserving separate family bookings.
 - ICE race-day viewing (live stream link, knockout board) is signed-in only: ice_knockout_riders and event_live_streams have authenticated-read RLS with crew/admin (stream: admin) writes and no anon API; Support riders auto-join from event_entrants via trigger. Keeps the website advertising only and drives account sign-ups.
 - The ICE trackside control link is a hashed, expiring, revocable token (ice_control_links, service-role only); token-holders act only through token-checked server functions on ICE knockout rows, never via RLS, so race-day crew need no account.
+
+- Chat moderation: admin-only RLS hides/reviews reports, blocks filter client-side, profanity masked by DB trigger.
