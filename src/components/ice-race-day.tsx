@@ -5,7 +5,7 @@ import { Map as MapIcon, Radio, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/lib/auth";
-import { ICE_ROUND_NOTE, useKnockout, youtubeId, type RaceClass } from "@/lib/ice-knockout";
+import { ICE_ROUND_NOTE, finishPositions, ordinal, useKnockout, youtubeId, type RaceClass } from "@/lib/ice-knockout";
 import { scrollAppTo } from "@/lib/app-scroll";
 
 function useLiveStream(eventId: string) {
@@ -89,6 +89,7 @@ export function IceKnockoutBoard({ eventId }: { eventId: string }) {
   const riders = (q.data ?? []).filter((r) => r.race_class === cls);
   const still = riders.filter((r) => r.status === "in");
   const out = riders.filter((r) => r.status === "out").sort((a, b) => (b.out_at ?? "").localeCompare(a.out_at ?? ""));
+  const places = finishPositions(riders);
   return (
     <section id="ice-knockout" data-section="ice_knockout" className="scroll-mt-16 space-y-3">
       <h2 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
@@ -108,18 +109,18 @@ export function IceKnockoutBoard({ eventId }: { eventId: string }) {
         {still.map((r) => (
           <li key={r.id} className="flex items-center justify-between rounded-xl bg-card px-3 py-2.5 ring-1 ring-border">
             <span className="text-sm font-bold text-ink">{r.bib_number ? `#${r.bib_number} ` : ""}{r.full_name}</span>
-            <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-black text-primary-foreground">IN</span>
+            <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-black text-primary-foreground">{places.get(r.id) === 1 ? "WINNER" : "IN"}</span>
           </li>
         ))}
       </ul>
       {out.length ? (
         <>
-          <p className="pt-1 text-[11px] font-bold uppercase tracking-widest text-ink-soft">Knocked out</p>
+          <p className="pt-1 text-[11px] font-bold uppercase tracking-widest text-ink-soft">Finishing order</p>
           <ul className="grid gap-1.5 sm:grid-cols-2">
             {out.map((r) => (
               <li key={r.id} className="flex items-center justify-between rounded-xl bg-secondary/50 px-3 py-2 opacity-60">
                 <span className="text-sm text-ink line-through decoration-ink-soft/50">{r.full_name}</span>
-                <span className="text-[11px] text-ink-soft">{r.out_round ?? "Out"}</span>
+                <span className="text-[11px] font-bold text-ink-soft">{places.has(r.id) ? ordinal(places.get(r.id)!) : "Out"}</span>
               </li>
             ))}
           </ul>

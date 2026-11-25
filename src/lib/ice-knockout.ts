@@ -71,3 +71,18 @@ export function youtubeId(url: string | null | undefined): string | null {
   const m = url.trim().match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
   return m?.[1] ?? null;
 }
+
+/** Finishing places from knockout order: first rider out finishes last. Riders still in have no place yet, except a sole survivor who wins. */
+export function finishPositions(riders: KnockoutRider[]): Map<string, number> {
+  const out = riders.filter((r) => r.status === "out").sort((a, b) => (a.out_at ?? "").localeCompare(b.out_at ?? ""));
+  const pos = new Map<string, number>();
+  out.forEach((r, i) => pos.set(r.id, riders.length - i));
+  const still = riders.filter((r) => r.status === "in");
+  if (still.length === 1 && riders.length > 1) pos.set(still[0]!.id, 1);
+  return pos;
+}
+
+export function ordinal(n: number): string {
+  const s = n % 100 >= 11 && n % 100 <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
+  return `${n}${s}`;
+}
