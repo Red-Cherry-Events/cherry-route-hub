@@ -62,4 +62,4 @@
 - Marketing-site spots-left feed is GET /api/public/availability?slug= (count-only, is_public events, per-class classes[].capacity plus events.capacity shared limit); never return entrant identities.
 - Tour de Addo website enquiries post to /api/public/tda-enquiry, gated by a CORS origin allow-list instead of a secret (browser caller); store first, then team email, rider auto-reply and consent-only Everlytic sync, whose failures never fail the response.
 - S2S reuses enquiry helpers and consent-only North interest to preserve TDA behaviour.
-- Event chat moderation: reports and hiding are admin-only via RLS (chat_reports, event_chat_messages.hidden); blocks are per-user rows filtered client-side; profanity masking is a DB trigger so every write path is covered.
+- Chat moderation: admin-only RLS hides/reviews reports, blocks filter client-side, profanity masked by DB trigger.
