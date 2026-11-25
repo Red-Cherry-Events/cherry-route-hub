@@ -62,3 +62,34 @@ export function isReviewRow(ev: unknown): boolean {
   const r = ev as { is_review_event?: unknown; isReviewEvent?: unknown };
   return r.is_review_event === true || r.isReviewEvent === true;
 }
+
+/** Demo names only: these riders are simulated and never stored. */
+export const REVIEW_DEMO_RIDERS = ["Demo Rider A", "Demo Rider B", "Demo Rider C", "Demo Rider D", "Demo Rider E"];
+
+/**
+ * Display-only demo riders for the app-review live map, circling the race
+ * village with fresh timestamps so reviewers always see moving dots. Never
+ * written to tracking_points (that table holds real GPS fixes only).
+ */
+export function reviewDemoPositions(center: { lat: number; lng: number }, now: number = Date.now()) {
+  return REVIEW_DEMO_RIDERS.map((name, i) => {
+    const angle = ((now / 1000 / 600 + i / REVIEW_DEMO_RIDERS.length) % 1) * 2 * Math.PI;
+    const r = 0.006 + i * 0.0015;
+    return {
+      userId: `review-demo-${i + 1}`,
+      riderName: name,
+      bib: String(901 + i),
+      category: "Demo",
+      batch: null,
+      lat: center.lat + r * Math.sin(angle),
+      lng: center.lng + r * Math.cos(angle) * 1.2,
+      accuracyM: 8,
+      batteryPct: null,
+      recordedAt: new Date(now - (i + 1) * 15_000).toISOString(),
+      sos: false,
+      sosReason: null,
+      finished: false,
+      stoppedForMs: null,
+    };
+  });
+}

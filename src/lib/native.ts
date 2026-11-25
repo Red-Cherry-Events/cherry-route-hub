@@ -266,13 +266,34 @@ export async function enableNativePush(): Promise<{ ok: boolean; reason?: string
   }
   const { token } = await fm.getToken();
   if (!token) return { ok: false, reason: "Couldn't register this phone for alerts. Try again in a moment." };
-  await saveToken(token);
+  try {
+    await saveToken(token);
+  } catch (e) {
+    console.error("[native-push] saving token failed:", e);
+    return { ok: false, reason: "Couldn't save alerts for this phone. Check your signal and try again." };
+  }
   try {
     localStorage.setItem("rce-native-push-token", token);
   } catch {
     /* ignore */
   }
   return { ok: true };
+}
+
+/** Re-saves the current FCM token for the signed-in rider when alerts are
+ *  already allowed (tokens rotate). Call once per launch after sign-in. */
+export async function resyncNativePushToken(): Promise<void> {
+  if (!isNativeApp()) return;
+  if ((await nativePushState()) !== "granted") return;
+  const { fm } = await messaging();
+  const { token } = await fm.getToken();
+  if (!token) return;
+  await saveToken(token);
+  try {
+    localStorage.setItem("rce-native-push-token", token);
+  } catch {
+    /* ignore */
+  }
 }
 
 export async function disableNativePush(): Promise<void> {
@@ -309,13 +330,16 @@ async function setupPushListeners() {
     } catch {
       /* ignore */
     }
-    if (!previous || previous === token) return; // only refresh tokens the rider opted in with
-    try {
-      localStorage.setItem("rce-native-push-token", token);
-    } catch {
-      /* ignore */
-    }
-    void saveToken(token).catch(() => undefined);
+    if (previous === token) return;
+    void nativePushState().then((state) => {
+      if (state !== "granted") return;
+      try {
+        localStorage.setItem("rce-native-push-token", token);
+      } catch {
+        /* ignore */
+      }
+      void saveToken(token).catch((e) => console.error("[native-push] token refresh save failed:", e));
+    });
   });
   // Tapping a notification opens the page it points at.
   await fm.addListener("notificationActionPerformed", ({ notification }) => {

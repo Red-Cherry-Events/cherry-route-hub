@@ -1,4 +1,5 @@
 import { SwipeNavigation } from "@/components/swipe-navigation";
+import { NativePushPrompt } from "@/components/native-push-prompt";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -274,6 +275,7 @@ function RootComponent() {
         </AppShell>
       )}
       {onAuthPages ? null : <Suspense fallback={null}><LazySetPasswordPrompt /></Suspense>}
+      {isEmbed || onAuthPages ? null : <NativePushPrompt />}
     </QueryClientProvider>
 
   );

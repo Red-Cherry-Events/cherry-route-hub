@@ -30,7 +30,10 @@ export const saveNativePushToken = createServerFn({ method: "POST" })
       },
       { onConflict: "token" },
     );
-    if (error) throw error;
+    if (error) {
+      console.error("[native-push] save token failed:", error.message);
+      throw new Error("Couldn't save this phone for alerts.");
+    }
 
     await admin
       .from("notification_preferences")

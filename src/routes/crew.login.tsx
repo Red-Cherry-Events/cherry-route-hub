@@ -8,6 +8,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { useIsCrew } from "@/lib/auth";
 import { BrandMark } from "@/components/ui-bits";
 import { safeAuthTarget } from "@/lib/auth-navigation";
+import { useInNativeApp } from "@/lib/use-native-app";
 import { loginIdentifierToEmail, isEmailAddress } from "@/lib/crew-username";
 
 export const Route = createFileRoute("/crew/login")({
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/crew/login")({
 });
 
 function CrewLoginPage() {
+  const inNativeApp = useInNativeApp();
   const { user, isCrew, loading } = useIsCrew();
   const navigate = useNavigate();
   const { next } = Route.useSearch();
@@ -140,13 +142,13 @@ function CrewLoginPage() {
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Sign in
         </button>
 
-        <button
+        {!inNativeApp ? <button
           type="button"
           onClick={google}
           className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-bold text-ink"
         >
           Continue with Google
-        </button>
+        </button> : null}
       </form>
 
       <p className="text-center text-xs text-ink-soft">

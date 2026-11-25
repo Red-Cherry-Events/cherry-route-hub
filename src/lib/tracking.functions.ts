@@ -354,6 +354,17 @@ export const fetchLiveTracking = createServerFn({ method: "GET" })
     const staff = Boolean(roles?.length);
     const { data: event } = await supabaseAdmin.from("events").select("spectator_mode, is_review_event, is_public").eq("id", data.eventId).maybeSingle();
     if (staff) await (await import("@/lib/review-event.server")).assertEventVisible(supabaseAdmin, data.eventId, caller);
+    // App review event: signed-in reviewers see five simulated demo riders.
+    if (event?.is_review_event === true) {
+      if (!caller) return { riders: [], activeSos: 0, since };
+      try {
+        await (await import("@/lib/review-event.server")).assertEventVisible(supabaseAdmin, data.eventId, caller);
+      } catch {
+        return { riders: [], activeSos: 0, since };
+      }
+      const { reviewDemoPositions } = await import("@/lib/review-event");
+      return { riders: reviewDemoPositions({ lat: -34.0745, lng: 18.889 }), activeSos: 0, since };
+    }
     if (!staff && !canPublishTracking(event)) return { riders: [], activeSos: 0, since };
     const { data: points, error } = await table(supabaseAdmin, "tracking_points")
       .select("user_id, entrant_id, lat, lng, accuracy_m, battery_pct, recorded_at")

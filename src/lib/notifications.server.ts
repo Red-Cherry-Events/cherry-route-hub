@@ -232,6 +232,37 @@ export async function dispatchNotification(input: DispatchInput): Promise<Dispat
   }
   if (deadIds.length) await admin.from("push_subscriptions").delete().in("id", deadIds);
 
+  // Store apps (iOS / Android) via Firebase Cloud Messaging. Runs alongside Web
+  // Push, never for WhatsApp-only broadcasts, and a failure here never stops
+  // the other channels.
+  if (!input.skipPush) {
+    try {
+      const { dispatchNativePush } = await import("./native-push.server");
+      const native = await dispatchNativePush(admin, {
+        userIds,
+        kind: (kind === "news" || kind === "event_reminder" || kind === "safety" ? kind : "general") as
+          "news" | "event_reminder" | "safety" | "general",
+        urgent,
+        payload: {
+          title: input.title,
+          body: input.body,
+          url: input.url || "/",
+          imageUrl: input.imageUrl || null,
+          notificationId,
+          urgent,
+          tag: input.dedupeKey || notificationId,
+        },
+      });
+      delivered += native.delivered;
+      failed += native.failed;
+      if (native.recipients) {
+        await admin.from("notifications").update({ recipients_count: targets.length + native.recipients }).eq("id", notificationId);
+      }
+    } catch (e) {
+      console.error("[notifications] native push failed:", e instanceof Error ? e.message : String(e));
+    }
+  }
+
   // Optional WhatsApp broadcast. Templates work any time; free-form text is
   // only allowed inside Meta's 24h window after the rider messaged us.
   let whatsappSent = 0;

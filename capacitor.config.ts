@@ -28,6 +28,12 @@ const config: CapacitorConfig = {
       "*.supabase.co",
       "*.lovable.app",
       "*.lovable.dev",
+      // Sign in with Apple: riderhub /~oauth/initiate -> oauth.lovable.app ->
+      // appleid.apple.com (Apple's login widget loads from idmsa.apple.com) ->
+      // oauth.lovable.app -> riderhub /~oauth/callback.
+      "oauth.lovable.app",
+      "appleid.apple.com",
+      "idmsa.apple.com",
     ],
   },
   ios: {

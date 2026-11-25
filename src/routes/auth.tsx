@@ -14,6 +14,7 @@ import { BrandMark } from "@/components/ui-bits";
 import { Button } from "@/components/ui/button";
 import { listKnownAccounts, rememberAccount, type KnownAccount } from "@/lib/known-accounts";
 import { safeAuthTarget } from "@/lib/auth-navigation";
+import { useInNativeApp } from "@/lib/use-native-app";
 
 
 
@@ -125,6 +126,7 @@ function AuthPage() {
   const { next, email: emailParam, add, deleted, disconnectApple, watch } = Route.useSearch();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const inNativeApp = useInNativeApp();
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(emailParam || add ? "signin" : "signup");
@@ -413,7 +415,7 @@ function AuthPage() {
           <AppleIcon />
           Continue with Apple
         </Button>
-        <Button
+        {!inNativeApp ? <Button
           type="button"
           variant="outline"
           onClick={() => void handleSocial("google")}
@@ -422,7 +424,7 @@ function AuthPage() {
         >
           <GoogleIcon />
           {isSignup ? "Sign up with Google" : "Continue with Google"}
-        </Button>
+        </Button> : null}
 
         <div className="my-4 flex items-center gap-3">
           <span className="h-px flex-1 bg-border" />
