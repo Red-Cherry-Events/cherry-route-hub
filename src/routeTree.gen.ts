@@ -76,6 +76,7 @@ import { Route as EmbedChatRouteImport } from './routes/embed.chat'
 import { Route as EmbedConnectRouteImport } from './routes/embed.connect'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
+import { Route as IceControlTokenRouteImport } from './routes/ice-control.$token'
 import { Route as MyEventsIndexRouteImport } from './routes/my-events.index'
 import { Route as MyEventsEventIdRouteImport } from './routes/my-events.$eventId'
 import { Route as RentalTokenRouteImport } from './routes/rental.$token'
@@ -480,6 +481,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
 const EventsEventIdRoute = EventsEventIdRouteImport.update({
   id: '/events/$eventId',
   path: '/events/$eventId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IceControlTokenRoute = IceControlTokenRouteImport.update({
+  id: '/ice-control/$token',
+  path: '/ice-control/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyEventsIndexRoute = MyEventsIndexRouteImport.update({
@@ -907,6 +913,7 @@ export interface FileRoutesByFullPath {
   '/embed/chat': typeof EmbedChatRoute
   '/embed/connect': typeof EmbedConnectRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/ice-control/$token': typeof IceControlTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1039,6 +1046,7 @@ export interface FileRoutesByTo {
   '/crew/tracking': typeof CrewTrackingRoute
   '/embed/chat': typeof EmbedChatRoute
   '/embed/connect': typeof EmbedConnectRoute
+  '/ice-control/$token': typeof IceControlTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1176,6 +1184,7 @@ export interface FileRoutesById {
   '/embed/chat': typeof EmbedChatRoute
   '/embed/connect': typeof EmbedConnectRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/ice-control/$token': typeof IceControlTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1314,6 +1323,7 @@ export interface FileRouteTypes {
     | '/embed/chat'
     | '/embed/connect'
     | '/events/$eventId'
+    | '/ice-control/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1446,6 +1456,7 @@ export interface FileRouteTypes {
     | '/crew/tracking'
     | '/embed/chat'
     | '/embed/connect'
+    | '/ice-control/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1582,6 +1593,7 @@ export interface FileRouteTypes {
     | '/embed/chat'
     | '/embed/connect'
     | '/events/$eventId'
+    | '/ice-control/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1687,6 +1699,7 @@ export interface RootRouteChildren {
   EmbedChatRoute: typeof EmbedChatRoute
   EmbedConnectRoute: typeof EmbedConnectRoute
   EventsEventIdRoute: typeof EventsEventIdRouteWithChildren
+  IceControlTokenRoute: typeof IceControlTokenRoute
   RentalTokenRoute: typeof RentalTokenRoute
   CrewIndexRoute: typeof CrewIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -2211,6 +2224,13 @@ declare module '@tanstack/react-router' {
       path: '/events/$eventId'
       fullPath: '/events/$eventId'
       preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ice-control/$token': {
+      id: '/ice-control/$token'
+      path: '/ice-control/$token'
+      fullPath: '/ice-control/$token'
+      preLoaderRoute: typeof IceControlTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-events/': {
@@ -2865,6 +2885,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedChatRoute: EmbedChatRoute,
   EmbedConnectRoute: EmbedConnectRoute,
   EventsEventIdRoute: EventsEventIdRouteWithChildren,
+  IceControlTokenRoute: IceControlTokenRoute,
   RentalTokenRoute: RentalTokenRoute,
   CrewIndexRoute: CrewIndexRoute,
   EventsIndexRoute: EventsIndexRoute,

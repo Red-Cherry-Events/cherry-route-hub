@@ -2707,6 +2707,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ice_control_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          expires_at: string
+          id?: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
       ice_knockout_riders: {
         Row: {
           bib_number: string | null

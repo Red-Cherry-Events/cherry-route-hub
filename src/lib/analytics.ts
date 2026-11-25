@@ -104,6 +104,7 @@ export function track({ eventName, path, durationMs, props }: TrackInput) {
   if (typeof window === "undefined") return;
   try {
     const pathname = path ?? window.location.pathname;
+    if (pathname.startsWith("/ice-control")) return; // private link token must never reach analytics
     if (excludedEventIds.size) {
       const evId = String((props as Record<string, unknown> | undefined)?.event_id ?? "");
       for (const id of excludedEventIds) if (evId === id || pathname.includes(id)) return;
