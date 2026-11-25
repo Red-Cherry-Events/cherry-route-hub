@@ -419,7 +419,9 @@ function MyEventDetailInner({ event }: { event: NonNullable<ReturnType<typeof Ro
           <p role="note" className="rounded-xl bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-900">{REVIEW_EVENT_NOTE}</p>
         </div>
       ) : null}
-      {event.dates_tbc ? null : (
+      {/* ICE is not a tracked event: its live board and stream already sit at
+          the top of the Info tab, so the tracking banner adds nothing here. */}
+      {event.dates_tbc || isIceEvent(event.name) ? null : (
         <div className="px-5 pt-4">
           <RaceWeekBanner
             eventId={event.id}

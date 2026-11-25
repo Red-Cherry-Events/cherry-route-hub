@@ -50,7 +50,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchMyEvents, type MyEventRow } from "@/lib/my-events";
 import type { QuickLinkIcon } from "@/lib/settings";
 import { brandHeader } from "@/lib/event-brand";
-import { curatedSponsorsFor } from "@/lib/event-sponsor-overrides";
+import { curatedSponsorsFor, isIceEvent } from "@/lib/event-sponsor-overrides";
 import { clearRiderAppVisit, crewLandingTarget, wantsRiderApp } from "@/lib/crew-landing";
 
 
@@ -230,8 +230,11 @@ function Home() {
     .slice(0, 4);
 
   // Race-week module: any published event in its race week pushes people to
-  // live tracking & results.
-  const raceWeekEvents = upcoming.filter((e) => isRaceWeek(e.date, e.days));
+  // live tracking & results. Inner City Enduro is excluded: it is a knockout
+  // event with no rider tracking, and its own event page carries the live board.
+  const raceWeekEvents = upcoming.filter(
+    (e) => isRaceWeek(e.date, e.days) && !isIceEvent(e.name),
+  );
 
   const nowMs = Date.now();
   const notifications = [...feed]
