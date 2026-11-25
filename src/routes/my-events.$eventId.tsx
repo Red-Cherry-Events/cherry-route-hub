@@ -434,14 +434,14 @@ function MyEventDetailInner({ event }: { event: NonNullable<ReturnType<typeof Ro
         {tab === "info" && (
           <div ref={infoRef} className="space-y-5">
             {isIceEvent(event.name) && user ? <IceRaceDayLive eventId={event.id} onOpenMap={() => selectTab("village", "quick_link")} /> : null}
+            {isIceEvent(event.name) && user ? <IceKnockoutBoard eventId={event.id} /> : null}
+            <InfoPanel eventId={event.id} description={event.description} distanceKm={event.distance_km} event={event} isLive={event.status === "live"} eventName={event.name} onTabChange={(t) => selectTab(t, "quick_link")} hasFreshNews={hasFreshNews} hasNightly={hasNightly} signedIn={Boolean(user)} />
             <section data-section="assistant">
-              <SectionTitle>Ask the assistant</SectionTitle>
+              <SectionTitle>Still have a question?</SectionTitle>
               <div className="mt-2">
                 <AskAdminPanel eventId={event.id} userId={user?.id ?? null} eventName={event.name} compact />
               </div>
             </section>
-            {isIceEvent(event.name) && user ? <IceKnockoutBoard eventId={event.id} /> : null}
-            <InfoPanel eventId={event.id} description={event.description} distanceKm={event.distance_km} event={event} isLive={event.status === "live"} eventName={event.name} onTabChange={(t) => selectTab(t, "quick_link")} hasFreshNews={hasFreshNews} hasNightly={hasNightly} signedIn={Boolean(user)} />
           </div>
         )}
         {tab === "accommodation" && (
