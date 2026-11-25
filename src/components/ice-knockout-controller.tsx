@@ -1,6 +1,6 @@
 // Phone-friendly ICE knockout controller shared by the crew page and the private trackside link.
 import { useState } from "react";
-import { Plus, Undo2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Undo2 } from "lucide-react";
 import { finishPositions, ordinal, type KnockoutRider, type RaceClass } from "@/lib/ice-knockout";
 
 export type KnockoutPatch = Pick<KnockoutRider, "status" | "out_round" | "out_at">;
@@ -35,6 +35,25 @@ export function IceKnockoutController({
     if (!last) return;
     const r = all.find((x) => x.id === last.id);
     if (r && (await onSave(r, last.prev))) setLast(null);
+  }
+
+  // Riders out, best place first (latest out_at first). Swapping out_at with a neighbour moves a rider one place.
+  const outOrder = riders.filter((r) => r.status === "out").sort((a, b) => (b.out_at ?? "").localeCompare(a.out_at ?? ""));
+  const [busy, setBusy] = useState(false);
+  async function move(i: number, dir: -1 | 1) {
+    const a = outOrder[i], b = outOrder[i + dir];
+    if (!a || !b || busy) return;
+    setBusy(true);
+    let aAt = b.out_at ?? new Date().toISOString();
+    let bAt = a.out_at ?? new Date().toISOString();
+    if (aAt === bAt) {
+      const t = Date.parse(aAt);
+      aAt = new Date(t + (dir === -1 ? 1 : -1)).toISOString();
+    }
+    const okA = await onSave(a, { status: "out", out_round: a.out_round, out_at: aAt });
+    const okB = okA && (await onSave(b, { status: "out", out_round: b.out_round, out_at: bAt }));
+    if (okB) setLast(null);
+    setBusy(false);
   }
 
   async function addRider(e: React.FormEvent) {
@@ -82,6 +101,23 @@ export function IceKnockoutController({
           </li>
         ))}
       </ul>
+
+      {outOrder.length > 1 ? (
+        <div className="space-y-2 rounded-2xl bg-card p-4 ring-1 ring-border">
+          <p className="text-sm font-bold text-ink">Fix finishing order</p>
+          <p className="text-[11px] text-ink-soft">Got the order wrong? Move a rider up or down.</p>
+          <ol className="space-y-1">
+            {outOrder.map((r, i) => (
+              <li key={r.id} className="flex items-center gap-2 rounded-xl bg-secondary/60 px-3 py-2">
+                <span className="w-10 text-xs font-black text-ink-soft">{ordinal(places.get(r.id) ?? 0)}</span>
+                <span className="flex-1 truncate text-sm font-bold text-ink">{r.full_name}</span>
+                <button type="button" aria-label={`Move ${r.full_name} up`} disabled={i === 0 || busy} onClick={() => void move(i, -1)} className="rounded-full bg-card p-2 ring-1 ring-border disabled:opacity-30"><ChevronUp className="h-4 w-4" /></button>
+                <button type="button" aria-label={`Move ${r.full_name} down`} disabled={i === outOrder.length - 1 || busy} onClick={() => void move(i, 1)} className="rounded-full bg-card p-2 ring-1 ring-border disabled:opacity-30"><ChevronDown className="h-4 w-4" /></button>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
 
       {adding ? (
         <form onSubmit={addRider} className="space-y-2 rounded-2xl bg-card p-4 ring-1 ring-border">
