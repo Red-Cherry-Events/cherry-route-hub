@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "Signed-in users read live stream" ON public.event_live_streams;
+CREATE POLICY "Signed-in users read live stream for visible events" ON public.event_live_streams FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.events e WHERE e.id = event_live_streams.event_id));
