@@ -5,6 +5,7 @@ import { isFixedIceVenue, ICE_VENUE_URL, ICE_VENUE_POINT } from "@/lib/ice-venue
 import { PodiumSection } from "@/components/podium-section";
 import { SlscKcaCard, isSabrinaLoveEvent } from "@/components/slsc-kca-card";
 import { EventResultsPanel } from "@/components/event-results-panel";
+import { IceKnockoutBoard } from "@/components/ice-race-day";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { withRegistrationDayLabels } from "@/lib/event-days";
@@ -146,7 +147,7 @@ function SpectatorEventPage() {
   });
   const rosterStatus = ridersQ.data?.status ?? "ok";
   const rosterOpensAt = ridersQ.data?.opens_at ?? null;
-  const roster: TrackedRider[] = ridersQ.data?.riders ?? [];
+  const roster: TrackedRider[] = useMemo(() => (ridersQ.data?.riders ?? []).filter((r) => !/^test entry$/i.test(r.category ?? "")), [ridersQ.data]);
 
 
   const fetchResults = useServerFn(getEventResults);
@@ -715,7 +716,23 @@ function SpectatorEventPage() {
       ) : null}
 
 
-      {tab === "riders" ? (
+      {(tab === "riders" || tab === "results") && isFixedIceVenue(eventId) ? (
+        <div className="px-5 pt-4 pb-8 animate-fade-in space-y-5">
+          {user ? (
+            <IceKnockoutBoard eventId={eventId} />
+          ) : (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-6 text-center">
+              <Lock className="mx-auto h-5 w-5 text-cherry" />
+              <p className="mt-2 text-sm font-semibold text-ink">Create a free account to watch Inner City Enduro live</p>
+              <p className="mt-1 text-sm text-ink-soft">See every Pro and Support rider and who is in or out after each heat.</p>
+              <Link to="/auth" search={{ next: `/spectate/${eventId}?tab=${tab}` } as never} className="mt-4 inline-block rounded-full bg-cherry px-5 py-2 text-sm font-semibold text-primary-foreground">Sign in</Link>
+            </div>
+          )}
+          {tab === "results" ? <EventResultsPanel eventId={eventId} /> : null}
+        </div>
+      ) : null}
+
+      {tab === "riders" && !isFixedIceVenue(eventId) ? (
         <div className="px-5 pt-4 pb-8 animate-fade-in">
           {rosterStatus !== "ok" && !ridersQ.isLoading ? (
             <div className="mt-2 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
@@ -852,7 +869,7 @@ function SpectatorEventPage() {
 
       ) : null}
 
-      {tab === "results" ? (
+      {tab === "results" && !isFixedIceVenue(eventId) ? (
         <div className="px-5 pt-4 pb-8 animate-fade-in">
           <div data-tour="results" />
           <EventResultsPanel eventId={eventId} />
