@@ -16,8 +16,10 @@ export const Route = createFileRoute("/api/public/hooks/email-workflow")({
           const result = await processDueWorkflowEmails(supabaseAdmin, { limit: 150 });
           const { processTdaNewsletter } = await import("@/lib/tda-newsletter.server");
           const newsletter = await processTdaNewsletter(supabaseAdmin);
+          const { processRiderHubAudience } = await import("@/lib/rider-hub-audience.server");
+          const riderHubAudience = await processRiderHubAudience(supabaseAdmin as never).catch((e: Error) => ({ error: e.message }));
           console.log("[email-workflow]", JSON.stringify(result));
-          return new Response(JSON.stringify({ success: true, ...result, newsletter }), {
+          return new Response(JSON.stringify({ success: true, ...result, newsletter, riderHubAudience }), {
             headers: { "Content-Type": "application/json" },
           });
         } catch (err) {

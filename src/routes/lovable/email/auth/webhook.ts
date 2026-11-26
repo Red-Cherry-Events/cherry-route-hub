@@ -10,6 +10,8 @@ import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
 const SITE_NAME = "Red Cherry Events Rider Hub"
+// Shown as the From name on account emails.
+const SENDER_NAME = "Team Red Cherry Events"
 const SENDER_DOMAIN = "notify.riderapp.redcherryevents.co.za"
 const ROOT_DOMAIN = "riderapp.redcherryevents.co.za"
 const FROM_DOMAIN = "notify.riderapp.redcherryevents.co.za"
@@ -19,7 +21,7 @@ const SITE_URL = `https://${ROOT_DOMAIN}`
 // owns only the email decisions: subjects, templates, and per-type props.
 const handler = createAuthEmailHandler({
   apiKey: process.env['LOVABLE_API_KEY']!,
-  from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+  from: `${SENDER_NAME} <noreply@${FROM_DOMAIN}>`,
   senderDomain: SENDER_DOMAIN,
   sendUrl: process.env['LOVABLE_SEND_URL'],
   emails: {

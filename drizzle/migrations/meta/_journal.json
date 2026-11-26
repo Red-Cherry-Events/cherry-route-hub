@@ -428,6 +428,13 @@
       "when": 1795678825803,
       "tag": "0060_ice_stream_overlay",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795697755964,
+      "tag": "0061_rider_hub_audience_sync",
+      "breakpoints": true
     }
   ]
 }

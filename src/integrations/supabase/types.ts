@@ -3863,6 +3863,8 @@ export type Database = {
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           entry_ninja_id: string | null
+          everlytic_error: string | null
+          everlytic_synced_at: string | null
           full_name: string | null
           id: string
           jacket_size: string | null
@@ -3877,6 +3879,8 @@ export type Database = {
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           entry_ninja_id?: string | null
+          everlytic_error?: string | null
+          everlytic_synced_at?: string | null
           full_name?: string | null
           id: string
           jacket_size?: string | null
@@ -3891,6 +3895,8 @@ export type Database = {
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           entry_ninja_id?: string | null
+          everlytic_error?: string | null
+          everlytic_synced_at?: string | null
           full_name?: string | null
           id?: string
           jacket_size?: string | null
@@ -4875,6 +4881,14 @@ export type Database = {
         Returns: undefined
       }
       promo_engagement_summary: { Args: { _since: string }; Returns: Json }
+      rider_hub_audience_pending: {
+        Args: { _limit: number }
+        Returns: {
+          email: string
+          full_name: string
+          id: string
+        }[]
+      }
       set_tda_newsletter_enabled: {
         Args: { _enabled: boolean }
         Returns: undefined
