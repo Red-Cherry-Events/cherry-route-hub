@@ -215,18 +215,7 @@ function MyEventDetail() {
     if (!event) void router.invalidate();
   }, [event, router]);
   const { user, loading } = useSession();
-  const ice = Boolean(event && isIceEvent(event.name));
-  const goAuth = useNavigate();
-  const sentRef = useRef(false);
-  useEffect(() => {
-    // ICE race-day viewing is for signed-in accounts: send visitors to sign in, then back here.
-    if (!ice || loading || user || sentRef.current) return;
-    if (!window.location.pathname.startsWith("/my-events/")) return;
-    sentRef.current = true;
-    void goAuth({ to: "/auth", search: { next: window.location.pathname + window.location.search, watch: "ice" }, replace: true });
-  }, [ice, loading, user, goAuth]);
   if (!event) return <div className="p-8 text-center text-sm text-ink-soft">Loading event…</div>;
-  if (ice && !user) return <div className="p-8 text-center text-sm text-ink-soft">Create a free account to watch Inner City Enduro live…</div>;
   return <MyEventDetailInner event={event} />;
 }
 
@@ -439,6 +428,14 @@ function MyEventDetailInner({ event }: { event: NonNullable<ReturnType<typeof Ro
           <div ref={infoRef} className="space-y-5">
             {isIceEvent(event.name) && user ? <IceRaceDayLive eventId={event.id} onOpenMap={() => selectTab("village", "quick_link")} /> : null}
             {isIceEvent(event.name) && user ? <IceKnockoutBoard eventId={event.id} /> : null}
+            {isIceEvent(event.name) && !user ? (
+              <section data-section="ice-watch-signin" className="rounded-2xl border border-border bg-card p-5 text-center">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary">Race day live</p>
+                <h2 className="mt-1 text-lg font-bold">Watch Inner City Enduro live</h2>
+                <p className="mt-1 text-sm text-ink-soft">Create a free account to watch the live stream, see who is in and who is out, and open the rider map.</p>
+                <Link to="/auth" search={{ next: `/my-events/${event.slug ?? event.id}`, watch: "ice" } as never} className="mt-4 inline-flex rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Sign in or create account</Link>
+              </section>
+            ) : null}
             <InfoPanel eventId={event.id} description={event.description} distanceKm={event.distance_km} event={event} isLive={event.status === "live"} eventName={event.name} onTabChange={(t) => selectTab(t, "quick_link")} hasFreshNews={hasFreshNews} hasNightly={hasNightly} signedIn={Boolean(user)} />
             <section data-section="assistant">
               <SectionTitle>Still have a question?</SectionTitle>
