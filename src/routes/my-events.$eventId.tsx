@@ -486,6 +486,9 @@ function MyEventDetailInner({ event }: { event: NonNullable<ReturnType<typeof Ro
         )}
 
         {tab === "routes" && <RoutesPanel eventId={event.id} event={event} eventName={event.name} />}
+        {tab === "results" && isIceEvent(event.name) && user ? (
+          <div className="px-5 pt-4"><IceKnockoutBoard eventId={event.id} /></div>
+        ) : null}
         {tab === "results" && <EventResultsPanel eventId={event.id} />}
         {tab === "news" && <EventNewsPanel posts={eventNews} />}
         {tab === "photos" && (
