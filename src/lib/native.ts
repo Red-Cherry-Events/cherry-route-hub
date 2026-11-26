@@ -18,6 +18,7 @@
 // Call `initNative()` once from the client (see __root.tsx). Browser-only.
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import type { BackgroundGeolocationPlugin, Location } from "@capacitor-community/background-geolocation";
+import { capacitorFacts, errInfo, errText, logDiagnostic } from "./diagnostics";
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>("BackgroundGeolocation");
 
@@ -42,6 +43,26 @@ let initialised = false;
 export async function initNative(): Promise<void> {
   if (initialised || !isNativeApp()) return;
   initialised = true;
+  try {
+    const avail = (n: string) => {
+      try {
+        return Capacitor.isPluginAvailable(n);
+      } catch {
+        return null;
+      }
+    };
+    void logDiagnostic("app_launch", {
+      isNative: isNativeApp(),
+      platform: Capacitor.getPlatform(),
+      plugins: {
+        FirebaseMessaging: avail("FirebaseMessaging"),
+        BackgroundGeolocation: avail("BackgroundGeolocation"),
+        StatusBar: avail("StatusBar"),
+      },
+    });
+  } catch {
+    /* never block launch */
+  }
   markAsInstalledApp();
   installGeolocationBridge();
   await Promise.allSettled([setupStatusBar(), setupBackButton(), setupPushListeners()]);
@@ -258,19 +279,64 @@ async function saveToken(token: string) {
   });
 }
 
-export async function enableNativePush(): Promise<{ ok: boolean; reason?: string }> {
-  const { fm } = await messaging();
-  const { receive } = await fm.requestPermissions();
-  if (receive !== "granted") {
-    return { ok: false, reason: "Notifications are off for Rider Hub. Turn them on in your phone's Settings." };
+export type NativePushResult = { ok: boolean; reason?: string; error?: string };
+
+/** Logs each step of the native push flow to app_diagnostics. */
+export async function enableNativePush(source = "unknown"): Promise<NativePushResult> {
+  const base = { source, ...capacitorFacts() };
+  const log = (step: string, extra: Record<string, unknown> = {}) =>
+    void logDiagnostic(`native_push.${step}`, { ...base, ...extra });
+  log("start");
+
+  let fm: Awaited<ReturnType<typeof messaging>>["fm"];
+  try {
+    fm = (await messaging()).fm;
+  } catch (e) {
+    log("load_plugin_failed", errInfo(e));
+    return { ok: false, reason: "Couldn't start alerts on this phone.", error: `Load plugin: ${errText(e)}` };
   }
-  const { token } = await fm.getToken();
-  if (!token) return { ok: false, reason: "Couldn't register this phone for alerts. Try again in a moment." };
+
+  try {
+    const perm = await fm.checkPermissions();
+    log("check_permissions", { result: perm });
+  } catch (e) {
+    log("check_permissions_failed", errInfo(e));
+  }
+
+  let receive: string;
+  try {
+    const perm = await fm.requestPermissions();
+    receive = perm.receive;
+    log("request_permissions", { result: perm });
+  } catch (e) {
+    log("request_permissions_failed", errInfo(e));
+    return { ok: false, reason: "Couldn't ask your phone for permission to send alerts.", error: `requestPermissions: ${errText(e)}` };
+  }
+  if (receive !== "granted") {
+    return {
+      ok: false,
+      reason: "Notifications are off for Rider Hub. Turn them on in your phone's Settings.",
+      error: `Permission: ${receive}`,
+    };
+  }
+
+  let token: string | undefined;
+  try {
+    token = (await fm.getToken()).token;
+    log("get_token", { hasToken: Boolean(token), length: token?.length ?? 0 });
+  } catch (e) {
+    log("get_token_failed", errInfo(e));
+    return { ok: false, reason: "Couldn't register this phone for alerts. Try again in a moment.", error: `getToken: ${errText(e)}` };
+  }
+  if (!token) return { ok: false, reason: "Couldn't register this phone for alerts. Try again in a moment.", error: "getToken returned no token" };
+
   try {
     await saveToken(token);
+    log("save_token", { ok: true });
   } catch (e) {
     console.error("[native-push] saving token failed:", e);
-    return { ok: false, reason: "Couldn't save alerts for this phone. Check your signal and try again." };
+    log("save_token_failed", errInfo(e));
+    return { ok: false, reason: "Couldn't save alerts for this phone. Check your signal and try again.", error: `Save: ${errText(e)}` };
   }
   try {
     localStorage.setItem("rce-native-push-token", token);
@@ -284,11 +350,42 @@ export async function enableNativePush(): Promise<{ ok: boolean; reason?: string
  *  already allowed (tokens rotate). Call once per launch after sign-in. */
 export async function resyncNativePushToken(): Promise<void> {
   if (!isNativeApp()) return;
-  if ((await nativePushState()) !== "granted") return;
-  const { fm } = await messaging();
-  const { token } = await fm.getToken();
+  const base = capacitorFacts();
+  const log = (step: string, extra: Record<string, unknown> = {}) =>
+    void logDiagnostic(`native_push_resync.${step}`, { ...base, ...extra });
+  let fm: Awaited<ReturnType<typeof messaging>>["fm"];
+  try {
+    fm = (await messaging()).fm;
+  } catch (e) {
+    log("load_plugin_failed", errInfo(e));
+    return;
+  }
+  let receive: string;
+  try {
+    const perm = await fm.checkPermissions();
+    receive = perm.receive;
+    log("check_permissions", { result: perm });
+  } catch (e) {
+    log("check_permissions_failed", errInfo(e));
+    return;
+  }
+  if (receive !== "granted") return;
+  let token: string | undefined;
+  try {
+    token = (await fm.getToken()).token;
+    log("get_token", { hasToken: Boolean(token), length: token?.length ?? 0 });
+  } catch (e) {
+    log("get_token_failed", errInfo(e));
+    return;
+  }
   if (!token) return;
-  await saveToken(token);
+  try {
+    await saveToken(token);
+    log("save_token", { ok: true });
+  } catch (e) {
+    log("save_token_failed", errInfo(e));
+    return;
+  }
   try {
     localStorage.setItem("rce-native-push-token", token);
   } catch {

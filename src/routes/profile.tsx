@@ -8,6 +8,7 @@ import { BlockedRidersCard } from "@/components/blocked-riders-card";
 import { useSession, signOut, useIsCrew, useIsAdmin } from "@/lib/auth";
 import { LogOut, Save, User as UserIcon, ShieldAlert, ShieldCheck, HardHat, Repeat, Plus, X } from "lucide-react";
 import { NotificationSettings } from "@/components/notification-settings";
+import { NativeAlertsButton } from "@/components/push-optin";
 import { RiderEventHistory } from "@/components/rider-event-history";
 import { RewardsSummary } from "@/components/rewards-summary";
 import { StarredRidersCard } from "@/components/starred-riders-card";
@@ -208,6 +209,8 @@ function Profile() {
           <p className="truncate text-xs text-ink-soft">{user.email}</p>
         </div>
       </div>
+
+      <NativeAlertsButton />
 
       <div data-section="rewards"><RewardsSummary /></div>
 

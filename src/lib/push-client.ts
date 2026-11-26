@@ -76,12 +76,19 @@ function keyToB64url(buf: ArrayBuffer | null): string {
 }
 
 /** Asks for permission, subscribes the device and stores it against the rider. */
-export async function enablePush(): Promise<{ ok: boolean; reason?: string }> {
+export async function enablePush(source = "push-optin"): Promise<{ ok: boolean; reason?: string; error?: string }> {
   if (inNativeApp()) {
-    const { enableNativePush } = await import("./native");
-    const res = await enableNativePush();
-    await refreshNativeState();
-    return res;
+    try {
+      const { enableNativePush } = await import("./native");
+      const res = await enableNativePush(source);
+      await refreshNativeState().catch(() => undefined);
+      return res;
+    } catch (e) {
+      const { errInfo, logDiagnostic } = await import("./diagnostics");
+      const info = errInfo(e);
+      void logDiagnostic("native_push.enable_push_failed", { source, ...info });
+      return { ok: false, reason: "Couldn't turn on alerts.", error: info.message };
+    }
   }
   if (pushBlockedHere()) return { ok: false, reason: "Open the published app (not the preview) to enable alerts." };
   const state = pushState();

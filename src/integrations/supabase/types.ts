@@ -147,6 +147,30 @@ export type Database = {
         }
         Relationships: []
       }
+      app_diagnostics: {
+        Row: {
+          created_at: string
+          detail: Json
+          event: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: Json
+          event: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: Json
+          event?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       branding_inventory: {
         Row: {
           active: boolean

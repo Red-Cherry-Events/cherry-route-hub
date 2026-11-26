@@ -8,3 +8,4 @@
 - The ICE trackside control link is a hashed, expiring, revocable token (ice_control_links, service-role only); token-holders act only through token-checked server functions on ICE knockout rows, never via RLS, so race-day crew need no account.
 
 - Chat moderation: admin-only RLS hides/reviews reports, blocks filter client-side, profanity masked by DB trigger.
+- Store-app push setup logs each step to app_diagnostics via logDiagnostic (src/lib/diagnostics.ts, never throws, token length only); insert-own RLS, admin-only read, so field failures are visible without device logs.

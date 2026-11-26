@@ -22,6 +22,7 @@ export function PushOptIn({ compact = false }: { compact?: boolean }) {
   const [signedIn, setSignedIn] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dismissed, setDismissed] = useState(true);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -48,13 +49,15 @@ export function PushOptIn({ compact = false }: { compact?: boolean }) {
 
   async function turnOn() {
     setBusy(true);
-    const res = await enablePush();
+    setErrorText(null);
+    const res = await enablePush("push-optin-card");
     setBusy(false);
     if (res.ok) {
       setSubscribed(true);
       toast.success("Race-day alerts are on");
     } else {
       toast.error(res.reason ?? "Couldn't turn on alerts");
+      setErrorText([res.reason, res.error].filter(Boolean).join(" · ") || null);
     }
   }
 
@@ -86,6 +89,7 @@ export function PushOptIn({ compact = false }: { compact?: boolean }) {
               {busy ? "Turning on…" : "Turn on alerts"}
             </button>
           )}
+          {errorText ? <p className="mt-2 break-words text-[11px] leading-snug text-muted-foreground">{errorText}</p> : null}
         </div>
         {!compact && (
           <button
@@ -109,6 +113,7 @@ export function PushToggle() {
   const [subscribed, setSubscribed] = useState(false);
   const [state, setState] = useState<PushState | null>(null);
   const [busy, setBusy] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -128,12 +133,14 @@ export function PushToggle() {
       setSubscribed(false);
       toast("Alerts turned off");
     } else {
-      const res = await enablePush();
+      setErrorText(null);
+      const res = await enablePush("profile-toggle");
       if (res.ok) {
         setSubscribed(true);
         toast.success("Race-day alerts are on");
       } else {
         toast.error(res.reason ?? "Couldn't turn on alerts");
+        setErrorText([res.reason, res.error].filter(Boolean).join(" · ") || null);
       }
     }
     setBusy(false);
@@ -154,6 +161,7 @@ export function PushToggle() {
                   ? "This device will receive alerts."
                   : "Turn on to get alerts on this device."}
         </p>
+        {errorText ? <p className="mt-1 break-words text-[11px] leading-snug text-muted-foreground">{errorText}</p> : null}
       </div>
       <button
         onClick={() => void toggle()}
@@ -211,6 +219,53 @@ export function InstallPrompt() {
       >
         <X className="h-4 w-4" />
       </button>
+    </div>
+  );
+}
+
+/** Store app only: always-visible button on the profile that retries alerts,
+ *  even if the one-time prompt was dismissed. */
+export function NativeAlertsButton() {
+  const [native, setNative] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNative(Boolean((window as any).Capacitor?.isNativePlatform?.()));
+  }, []);
+
+  if (!native) return null;
+
+  async function turnOn() {
+    try {
+      localStorage.removeItem("rce-native-push-asked");
+    } catch {
+      /* ignore */
+    }
+    setBusy(true);
+    setErrorText(null);
+    const res = await enablePush("profile-native-button");
+    setBusy(false);
+    if (res.ok) {
+      setDone(true);
+      toast.success("Race-day alerts are on");
+    } else {
+      setErrorText([res.reason, res.error].filter(Boolean).join(" · ") || "Couldn't turn on alerts.");
+    }
+  }
+
+  return (
+    <div className="mx-5 mt-4 rounded-2xl bg-card p-4 ring-1 ring-border">
+      <button
+        onClick={() => void turnOn()}
+        disabled={busy}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cherry px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+      >
+        <Bell className="h-4 w-4" />
+        {busy ? "Turning on…" : done ? "Race alerts are on" : "Turn on race alerts"}
+      </button>
+      {errorText ? <p className="mt-2 break-words text-[11px] leading-snug text-muted-foreground">{errorText}</p> : null}
     </div>
   );
 }
