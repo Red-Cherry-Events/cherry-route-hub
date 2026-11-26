@@ -35,6 +35,7 @@ import {
 import { BrandMark, SectionTitle, TypeBadge } from "@/components/ui-bits";
 import { SlscKcaPill, isSabrinaLoveEvent } from "@/components/slsc-kca-card";
 import { RaceWeekBanner, isRaceWeek } from "@/components/race-week-banner";
+import { IceHomeFeature, iceHomeFeature } from "@/components/ice-home-feature";
 import { SponsorScroller } from "@/components/sponsor-scroller";
 import { RedCherrySocials } from "@/components/social-links-card";
 import { InstallPrompt, PushOptIn } from "@/components/push-optin";
@@ -135,6 +136,10 @@ function Home() {
     .filter((e) => new Date(e.date).getTime() >= Date.now() - 12 * 60 * 60 * 1000)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  // Inner City Enduro gets its own feature at the very top of the home screen
+  // while it is in its race week, above anything a rider is already entered for.
+  const iceFeature = useMemo(() => iceHomeFeature(allEvents), [allEvents]);
+
   // Determine which sport(s) this signed-in rider has actually entered.
   // The query shares its cache with NextEventCard.
   const myEventsQ = useQuery({
@@ -191,7 +196,9 @@ function Home() {
   // Spotlight: never repeat the hero. Signed-in riders get the next event they
   // haven't entered, in the sport they actually ride — most riders do either MTB
   // or moto, not both, so we prefer the sport of their own next event.
-  const notEntered = upcoming.filter((e) => e.id !== heroEventId && !myEventIds.has(e.id));
+  const notEntered = upcoming.filter(
+    (e) => e.id !== heroEventId && e.id !== iceFeature?.id && !myEventIds.has(e.id),
+  );
   const primarySport: "moto" | "mtb" | null = myNext
     ? getEventSport(myNext.event.discipline, myNext.event.name)
     : enteredSports.size === 1
@@ -221,7 +228,9 @@ function Home() {
     : null;
 
   // Anything already featured above is hidden from the sport lists.
-  const hiddenIds = new Set([heroEventId, spotlight?.id].filter(Boolean) as string[]);
+  const hiddenIds = new Set(
+    [heroEventId, spotlight?.id, iceFeature?.id].filter(Boolean) as string[],
+  );
   const motoEvents = upcoming
     .filter((e) => !hiddenIds.has(e.id) && getEventSport(e.discipline, e.name) === "moto")
     .slice(0, 4);
@@ -325,6 +334,9 @@ function Home() {
 
       </div>
 
+      {/* Inner City Enduro first: it is the event happening this weekend. */}
+      {iceFeature ? <IceHomeFeature event={iceFeature} /> : null}
+
       {raceWeekEvents.length > 0 ? (
         <div className="mt-4 space-y-2 px-5">
           {raceWeekEvents.map((e) => (
@@ -355,23 +367,28 @@ function Home() {
       ) : null}
 
 
-      {!loading && !user && spotlight ? (
+      {!loading && !user ? (
         <>
-          <SectionTitle title={spotlight.happeningNow ? "Happening now" : "Next up"} />
-          <div className="px-5">
-            <EventSpotlight
-              eventId={spotlight.id}
-              name={spotlight.name}
-              location={spotlight.location}
-              date={spotlight.date}
-              logoUrl={spotlight.logoUrl}
-              heroColor={spotlight.heroColor}
-              description={spotlight.description}
-              entered={false}
-              guest
-              happeningNow={spotlight.happeningNow}
-            />
-          </div>
+          {/* ICE already has its own feature above, so don't repeat it here. */}
+          {spotlight && spotlight.id !== iceFeature?.id ? (
+            <>
+              <SectionTitle title={spotlight.happeningNow ? "Happening now" : "Next up"} />
+              <div className="px-5">
+                <EventSpotlight
+                  eventId={spotlight.id}
+                  name={spotlight.name}
+                  location={spotlight.location}
+                  date={spotlight.date}
+                  logoUrl={spotlight.logoUrl}
+                  heroColor={spotlight.heroColor}
+                  description={spotlight.description}
+                  entered={false}
+                  guest
+                  happeningNow={spotlight.happeningNow}
+                />
+              </div>
+            </>
+          ) : null}
           {/* News is shown once, in the "Latest news" section below. */}
 
           <div className="mt-4 px-5">
