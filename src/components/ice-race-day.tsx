@@ -1,5 +1,5 @@
 // ICE race-day surfaces for signed-in users: live stream, knockout board and map jump.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Map as MapIcon, Radio, Trophy } from "lucide-react";
 import { toast } from "sonner";
@@ -29,15 +29,7 @@ export function IceRaceDayLive({ eventId, onOpenMap }: { eventId: string; onOpen
         <Radio className="h-4 w-4 text-cherry" /> Race day live
       </h2>
       {id ? (
-        <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink ring-1 ring-border">
-          <iframe
-            src={`https://www.youtube.com/embed/${id}?autoplay=0&rel=0`}
-            title="Inner City Enduro live stream"
-            className="h-full w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
+        <StreamPlayer id={id} />
       ) : (
         <div className="rounded-2xl bg-ink p-4 text-primary-foreground ring-1 ring-border">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cherry">Live stream</p>
@@ -55,6 +47,57 @@ export function IceRaceDayLive({ eventId, onOpenMap }: { eventId: string; onOpen
         </button>
       </div>
     </section>
+  );
+}
+
+// Sunday 29 Nov 2026, 10:00 SAST.
+const STREAM_START = Date.parse("2026-11-29T08:00:00Z");
+
+function StreamPlayer({ id }: { id: string }) {
+  const [now, setNow] = useState<number | null>(null);
+  const [play, setPlay] = useState(false);
+  useEffect(() => {
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const left = now === null ? null : STREAM_START - now;
+  if (play || (left !== null && left <= 0)) {
+    return (
+      <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink ring-1 ring-border">
+        <iframe
+          src={`https://www.youtube.com/embed/${id}?autoplay=${play ? 1 : 0}&rel=0`}
+          title="Inner City Enduro live stream"
+          className="h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
+  const s = Math.max(0, Math.floor((left ?? 0) / 1000));
+  const parts = [
+    { v: Math.floor(s / 86400), l: "Days" },
+    { v: Math.floor((s % 86400) / 3600), l: "Hours" },
+    { v: Math.floor((s % 3600) / 60), l: "Mins" },
+    { v: s % 60, l: "Secs" },
+  ];
+  return (
+    <button type="button" onClick={() => setPlay(true)} className="relative block aspect-video w-full overflow-hidden rounded-2xl bg-ink text-left ring-1 ring-border" aria-label="Open the Inner City Enduro live stream">
+      <img src={`https://img.youtube.com/vi/${id}/maxresdefault.jpg`} alt="Inner City Enduro live stream" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ink/60 p-3 text-primary-foreground">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cherry sm:text-xs">Live stream starts in</p>
+        <div className="flex gap-2 sm:gap-3">
+          {parts.map((p) => (
+            <div key={p.l} className="min-w-12 rounded-xl bg-ink/80 px-2 py-1.5 text-center ring-1 ring-primary-foreground/20 sm:min-w-16">
+              <p className="font-display text-2xl font-black tabular-nums sm:text-4xl">{left === null ? "--" : String(p.v).padStart(2, "0")}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest opacity-80">{p.l}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs font-bold opacity-90">Sunday 29 Nov · 10:00</p>
+      </div>
+    </button>
   );
 }
 
