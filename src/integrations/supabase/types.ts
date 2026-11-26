@@ -2798,6 +2798,7 @@ export type Database = {
           event_id: string
           expires_at: string
           id: string
+          kind: string
           revoked_at: string | null
           token_hash: string
         }
@@ -2807,6 +2808,7 @@ export type Database = {
           event_id: string
           expires_at: string
           id?: string
+          kind?: string
           revoked_at?: string | null
           token_hash: string
         }
@@ -2816,6 +2818,7 @@ export type Database = {
           event_id?: string
           expires_at?: string
           id?: string
+          kind?: string
           revoked_at?: string | null
           token_hash?: string
         }
@@ -2873,6 +2876,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ice_stream_push: {
+        Row: {
+          event_id: string
+          pushed_at: string
+          race_class: string | null
+          rows: Json
+          visible: boolean
+        }
+        Insert: {
+          event_id: string
+          pushed_at?: string
+          race_class?: string | null
+          rows?: Json
+          visible?: boolean
+        }
+        Update: {
+          event_id?: string
+          pushed_at?: string
+          race_class?: string | null
+          rows?: Json
+          visible?: boolean
+        }
+        Relationships: []
       }
       id_lookup_attempts: {
         Row: {

@@ -9,3 +9,4 @@
 
 - Chat moderation: admin-only RLS hides/reviews reports, blocks filter client-side, profanity masked by DB trigger.
 - Store-app push setup logs each step to app_diagnostics via logDiagnostic (src/lib/diagnostics.ts, never throws, token length only); insert-own RLS, admin-only read, so field failures are visible without device logs.
+- ICE OBS overlay uses a separate kind='overlay' token in ice_control_links and reads only the last crew push from service-only ice_stream_push, so the stream shows verified results, never mid-race taps.

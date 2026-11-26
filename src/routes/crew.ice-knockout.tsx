@@ -4,6 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { IceKnockoutController } from "@/components/ice-knockout-controller";
 import { IceControlLinkAdmin } from "@/components/ice-control-link-admin";
+import { IceStreamPush } from "@/components/ice-stream-push";
+import { useServerFn } from "@tanstack/react-start";
+import { iceStreamPushStaff } from "@/lib/ice-stream.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useIsCrew } from "@/lib/auth";
@@ -29,6 +32,7 @@ function CrewIceKnockout() {
   const qc = useQueryClient();
   const { isAdmin } = useIsAdmin();
   const q = useKnockout(ICE_EVENT_ID, isCrew);
+  const pushStaff = useServerFn(iceStreamPushStaff);
 
   if (loading) return <p className="p-4 text-sm text-ink-soft">Loading…</p>;
   if (!user) return <Navigate to="/crew/login" />;
@@ -61,6 +65,8 @@ function CrewIceKnockout() {
       </header>
 
       {isAdmin ? <IceControlLinkAdmin /> : null}
+      {isAdmin ? <IceControlLinkAdmin kind="overlay" /> : null}
+      <IceStreamPush push={(d) => pushStaff({ data: d })} />
       <IceKnockoutController riders={q.data ?? []} loading={q.isLoading} onSave={save} onAdd={onAdd} />
     </div>
   );

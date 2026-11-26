@@ -210,7 +210,7 @@ function RootComponent() {
   // Embed routes render bare for third-party iframes: no shell, no assistant,
   // no prompts — just the embedded content.
   const isEmbed = useRouterState({
-    select: (s) => s.location.pathname.startsWith("/embed") || s.location.pathname.startsWith("/ice-control/") || s.location.pathname.startsWith("/ask/") || s.location.pathname.startsWith("/rental/") || s.location.pathname === "/otto1890-signup" || s.location.pathname === "/ice-signup" || s.location.pathname === "/ice-signup-inline",
+    select: (s) => s.location.pathname.startsWith("/embed") || s.location.pathname.startsWith("/ice-control/") || s.location.pathname.startsWith("/ice-overlay/") || s.location.pathname.startsWith("/ask/") || s.location.pathname.startsWith("/rental/") || s.location.pathname === "/otto1890-signup" || s.location.pathname === "/ice-signup" || s.location.pathname === "/ice-signup-inline",
   });
   const routeLoading = useRouterState({ select: (s) => s.isLoading });
   const onAuthPages = useRouterState({
@@ -219,7 +219,7 @@ function RootComponent() {
       s.location.pathname.startsWith("/reset-password") ||
       s.location.pathname.startsWith("/embed") ||
       s.location.pathname.startsWith("/ask/") ||
-      s.location.pathname.startsWith("/ice-control/") ||
+      s.location.pathname.startsWith("/ice-control/") || s.location.pathname.startsWith("/ice-overlay/") ||
       s.location.pathname.startsWith("/rental/") ||
       s.location.pathname === "/otto1890-signup" ||
       s.location.pathname === "/ice-signup" ||

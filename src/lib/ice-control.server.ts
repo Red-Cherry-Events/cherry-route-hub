@@ -20,7 +20,7 @@ export function newToken(): string {
 }
 
 /** True when the token matches an active, unexpired link for ICE. Bad attempts are rate limited. */
-export async function checkControlToken(token: unknown): Promise<boolean> {
+export async function checkControlToken(token: unknown, kind: "control" | "overlay" = "control"): Promise<boolean> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   let ok = false;
   if (typeof token === "string" && TOKEN_RE.test(token)) {
@@ -29,6 +29,7 @@ export async function checkControlToken(token: unknown): Promise<boolean> {
       .select("id")
       .eq("token_hash", await hashToken(token))
       .eq("event_id", ICE_EVENT_ID)
+      .eq("kind", kind)
       .is("revoked_at", null)
       .gt("expires_at", new Date().toISOString())
       .maybeSingle();

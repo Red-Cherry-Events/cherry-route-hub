@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { IceKnockoutController, type KnockoutPatch } from "@/components/ice-knockout-controller";
+import { IceStreamPush } from "@/components/ice-stream-push";
+import { iceStreamPushToken } from "@/lib/ice-stream.functions";
 import { iceControlAdd, iceControlLoad, iceControlSet } from "@/lib/ice-control.functions";
 import type { KnockoutRider, RaceClass } from "@/lib/ice-knockout";
 
@@ -30,6 +32,7 @@ function IceControl() {
   const load = useServerFn(iceControlLoad);
   const set = useServerFn(iceControlSet);
   const add = useServerFn(iceControlAdd);
+  const pushStream = useServerFn(iceStreamPushToken);
   const key = ["ice-control", "riders"];
   const q = useQuery({
     queryKey: key,
@@ -74,6 +77,7 @@ function IceControl() {
         <h1 className="font-display text-2xl font-bold text-ink">ICE knockout tracker</h1>
         <p className="text-sm text-ink-soft">Inner City Enduro 2026. Tap a rider to mark them out. Changes show on the event page straight away.</p>
       </header>
+      <IceStreamPush push={(d) => pushStream({ data: { token, ...d } })} />
       <IceKnockoutController riders={q.data.riders} loading={false} onSave={onSave} onAdd={onAdd} />
     </Frame>
   );

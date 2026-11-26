@@ -59,42 +59,47 @@ async function requireAdmin(supabase: Parameters<typeof checkIsAdmin>[0]) {
   if (!(await checkIsAdmin(supabase))) throw new Error("Forbidden");
 }
 
+const kindSchema = z.object({ kind: z.enum(["control", "overlay"]).default("control") });
+
 export const iceControlStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d) => kindSchema.parse(d ?? {}))
+  .handler(async ({ context, data: input }) => {
     await requireAdmin(context.supabase);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("ice_control_links").select("created_at, expires_at")
-      .eq("event_id", ICE_EVENT_ID).is("revoked_at", null).gt("expires_at", new Date().toISOString())
+      .eq("event_id", ICE_EVENT_ID).eq("kind", input.kind).is("revoked_at", null).gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     return { active: Boolean(data), createdAt: data?.created_at ?? null, expiresAt: data?.expires_at ?? null };
   });
 
-async function revokeAll() {
+async function revokeAll(kind: "control" | "overlay") {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  await supabaseAdmin.from("ice_control_links").update({ revoked_at: new Date().toISOString() }).eq("event_id", ICE_EVENT_ID).is("revoked_at", null);
+  await supabaseAdmin.from("ice_control_links").update({ revoked_at: new Date().toISOString() }).eq("event_id", ICE_EVENT_ID).eq("kind", kind).is("revoked_at", null);
 }
 
 export const iceControlRevoke = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d) => kindSchema.parse(d ?? {}))
+  .handler(async ({ context, data: input }) => {
     await requireAdmin(context.supabase);
-    await revokeAll();
+    await revokeAll(input.kind);
     return { ok: true };
   });
 
 export const iceControlCreate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d) => kindSchema.parse(d ?? {}))
+  .handler(async ({ context, data: input }) => {
     await requireAdmin(context.supabase);
     if (Date.now() >= Date.parse(ICE_CONTROL_EXPIRES_AT)) throw new Error("The event window has ended.");
-    await revokeAll();
+    await revokeAll(input.kind);
     const token = newToken();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("ice_control_links").insert({
-      event_id: ICE_EVENT_ID, token_hash: await hashToken(token), expires_at: ICE_CONTROL_EXPIRES_AT, created_by: context.userId,
+      event_id: ICE_EVENT_ID, kind: input.kind, token_hash: await hashToken(token), expires_at: ICE_CONTROL_EXPIRES_AT, created_by: context.userId,
     });
     if (error) throw new Error("Could not create link.");
-    return { path: `/ice-control/${token}`, expiresAt: ICE_CONTROL_EXPIRES_AT };
+    return { path: input.kind === "overlay" ? `/ice-overlay/${token}` : `/ice-control/${token}`, expiresAt: ICE_CONTROL_EXPIRES_AT };
   });

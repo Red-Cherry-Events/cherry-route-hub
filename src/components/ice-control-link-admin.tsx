@@ -7,25 +7,25 @@ import { iceControlCreate, iceControlRevoke, iceControlStatus } from "@/lib/ice-
 
 const fmt = (iso: string) => new Date(iso).toLocaleString("en-ZA", { timeZone: "Africa/Johannesburg", dateStyle: "medium", timeStyle: "short" });
 
-export function IceControlLinkAdmin() {
+export function IceControlLinkAdmin({ kind = "control" }: { kind?: "control" | "overlay" }) {
   const qc = useQueryClient();
   const status = useServerFn(iceControlStatus);
   const create = useServerFn(iceControlCreate);
   const revoke = useServerFn(iceControlRevoke);
   const [fresh, setFresh] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const q = useQuery({ queryKey: ["ice-control-status"], queryFn: () => status() });
+  const q = useQuery({ queryKey: ["ice-control-status", kind], queryFn: () => status({ data: { kind } }) });
 
   async function run(fn: () => Promise<void>) {
     setBusy(true);
     try { await fn(); } catch { toast.error("That did not work. Try again."); }
     setBusy(false);
-    void qc.invalidateQueries({ queryKey: ["ice-control-status"] });
+    void qc.invalidateQueries({ queryKey: ["ice-control-status", kind] });
   }
 
   return (
     <section className="space-y-2 rounded-2xl bg-card p-4 ring-1 ring-border">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-ink-soft">Admin · Trackside control link</p>
+      <p className="text-[11px] font-bold uppercase tracking-widest text-ink-soft">Admin · {kind === "overlay" ? "OBS stream overlay link" : "Trackside control link"}</p>
       <p className="text-sm text-ink">
         {q.data?.active && q.data.expiresAt ? `Active. Works without sign-in until ${fmt(q.data.expiresAt)}.` : "No active link."}
       </p>
@@ -37,8 +37,8 @@ export function IceControlLinkAdmin() {
         </div>
       ) : null}
       <div className="flex gap-2">
-        <button type="button" disabled={busy} onClick={() => void run(async () => { const r = await create(); setFresh(`${window.location.origin}${r.path}`); })} className="flex-1 rounded-full bg-cherry py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60">Create new link</button>
-        <button type="button" disabled={busy || !q.data?.active} onClick={() => void run(async () => { await revoke(); setFresh(null); })} className="flex-1 rounded-full bg-secondary py-2.5 text-sm font-bold text-ink disabled:opacity-60">Revoke link</button>
+        <button type="button" disabled={busy} onClick={() => void run(async () => { const r = await create({ data: { kind } }); setFresh(`${window.location.origin}${r.path}`); })} className="flex-1 rounded-full bg-cherry py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60">Create new link</button>
+        <button type="button" disabled={busy || !q.data?.active} onClick={() => void run(async () => { await revoke({ data: { kind } }); setFresh(null); })} className="flex-1 rounded-full bg-secondary py-2.5 text-sm font-bold text-ink disabled:opacity-60">Revoke link</button>
       </div>
       <p className="text-[11px] text-ink-soft">Creating a new link switches the old one off.</p>
     </section>

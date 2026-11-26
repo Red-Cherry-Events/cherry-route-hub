@@ -78,6 +78,7 @@ import { Route as EmbedConnectRouteImport } from './routes/embed.connect'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as IceControlTokenRouteImport } from './routes/ice-control.$token'
+import { Route as IceOverlayTokenRouteImport } from './routes/ice-overlay.$token'
 import { Route as MyEventsIndexRouteImport } from './routes/my-events.index'
 import { Route as MyEventsEventIdRouteImport } from './routes/my-events.$eventId'
 import { Route as RentalTokenRouteImport } from './routes/rental.$token'
@@ -492,6 +493,11 @@ const EventsEventIdRoute = EventsEventIdRouteImport.update({
 const IceControlTokenRoute = IceControlTokenRouteImport.update({
   id: '/ice-control/$token',
   path: '/ice-control/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IceOverlayTokenRoute = IceOverlayTokenRouteImport.update({
+  id: '/ice-overlay/$token',
+  path: '/ice-overlay/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyEventsIndexRoute = MyEventsIndexRouteImport.update({
@@ -921,6 +927,7 @@ export interface FileRoutesByFullPath {
   '/embed/connect': typeof EmbedConnectRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/ice-control/$token': typeof IceControlTokenRoute
+  '/ice-overlay/$token': typeof IceOverlayTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1055,6 +1062,7 @@ export interface FileRoutesByTo {
   '/embed/chat': typeof EmbedChatRoute
   '/embed/connect': typeof EmbedConnectRoute
   '/ice-control/$token': typeof IceControlTokenRoute
+  '/ice-overlay/$token': typeof IceOverlayTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1194,6 +1202,7 @@ export interface FileRoutesById {
   '/embed/connect': typeof EmbedConnectRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/ice-control/$token': typeof IceControlTokenRoute
+  '/ice-overlay/$token': typeof IceOverlayTokenRoute
   '/my-events/$eventId': typeof MyEventsEventIdRoute
   '/rental/$token': typeof RentalTokenRoute
   '/spectate/$eventId': typeof SpectateEventIdRoute
@@ -1334,6 +1343,7 @@ export interface FileRouteTypes {
     | '/embed/connect'
     | '/events/$eventId'
     | '/ice-control/$token'
+    | '/ice-overlay/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1468,6 +1478,7 @@ export interface FileRouteTypes {
     | '/embed/chat'
     | '/embed/connect'
     | '/ice-control/$token'
+    | '/ice-overlay/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1606,6 +1617,7 @@ export interface FileRouteTypes {
     | '/embed/connect'
     | '/events/$eventId'
     | '/ice-control/$token'
+    | '/ice-overlay/$token'
     | '/my-events/$eventId'
     | '/rental/$token'
     | '/spectate/$eventId'
@@ -1712,6 +1724,7 @@ export interface RootRouteChildren {
   EmbedConnectRoute: typeof EmbedConnectRoute
   EventsEventIdRoute: typeof EventsEventIdRouteWithChildren
   IceControlTokenRoute: typeof IceControlTokenRoute
+  IceOverlayTokenRoute: typeof IceOverlayTokenRoute
   RentalTokenRoute: typeof RentalTokenRoute
   CrewIndexRoute: typeof CrewIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -2250,6 +2263,13 @@ declare module '@tanstack/react-router' {
       path: '/ice-control/$token'
       fullPath: '/ice-control/$token'
       preLoaderRoute: typeof IceControlTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ice-overlay/$token': {
+      id: '/ice-overlay/$token'
+      path: '/ice-overlay/$token'
+      fullPath: '/ice-overlay/$token'
+      preLoaderRoute: typeof IceOverlayTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-events/': {
@@ -2907,6 +2927,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedConnectRoute: EmbedConnectRoute,
   EventsEventIdRoute: EventsEventIdRouteWithChildren,
   IceControlTokenRoute: IceControlTokenRoute,
+  IceOverlayTokenRoute: IceOverlayTokenRoute,
   RentalTokenRoute: RentalTokenRoute,
   CrewIndexRoute: CrewIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
