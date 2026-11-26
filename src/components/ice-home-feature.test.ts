@@ -7,7 +7,7 @@ import type { Event } from "@/lib/mock-data";
 const ICE_DATE = "2026-11-28T05:00:00.000Z";
 
 function event(over: Partial<Event> = {}): Event {
-  return {
+  const base: Event = {
     id: "f046ce38-e687-4038-959d-271ba20825f0",
     externalId: null,
     name: "Inner City Enduro 2026",
@@ -18,14 +18,15 @@ function event(over: Partial<Event> = {}): Event {
     status: "open",
     heroColor: "#c32236",
     description: "",
+    schedule: [],
     mapQuery: "",
     entered: false,
     days: [
       { id: "d1", date: "2026-11-28", routes: [] },
       { id: "d2", date: "2026-11-29", routes: [] },
     ],
-    ...over,
   };
+  return Object.assign(base, over);
 }
 
 const at = (iso: string) => Date.parse(iso);
