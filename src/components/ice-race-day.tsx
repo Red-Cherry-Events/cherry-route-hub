@@ -41,7 +41,7 @@ export function IceRaceDayLive({ eventId, onOpenMap }: { eventId: string; onOpen
       ) : (
         <div className="rounded-2xl bg-ink p-4 text-primary-foreground ring-1 ring-border">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cherry">Live stream</p>
-          <p className="mt-1 font-display text-lg font-bold">Live stream starts Sunday 29 Nov, first heat 11:00</p>
+          <p className="mt-1 font-display text-lg font-bold">Live stream starts Sunday 29 Nov at 10:00</p>
           <p className="mt-1 text-sm opacity-80">Come back here on race day. The player shows up on this page.</p>
         </div>
       )}
