@@ -57,3 +57,11 @@ export const iceOverlayLoad = createServerFn({ method: "POST" })
     const { data: row } = await supabaseAdmin.from("ice_stream_push").select("race_class, rows, visible, pushed_at").eq("event_id", ICE_EVENT_ID).maybeSingle();
     return { valid: true as const, state: (row ?? null) as StreamState | null };
   });
+
+/** Johann's switch: the overlay link itself can pick Pro, Support or hide. */
+export const iceStreamPushOverlay = createServerFn({ method: "POST" })
+  .inputValidator((d) => pushSchema.extend({ token: z.string().max(100) }).parse(d))
+  .handler(async ({ data }) => {
+    if (!(await checkControlToken(data.token, "overlay"))) return { ok: false };
+    return doPush(data);
+  });
