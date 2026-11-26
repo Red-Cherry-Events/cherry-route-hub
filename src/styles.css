@@ -657,3 +657,15 @@ html, body { overflow-x: clip; max-width: 100%; }
     overscroll-behavior: none;
   }
 }
+
+/* ICE OBS overlay, matches the Inner City Enduro brand (red, black, navy, condensed caps). */
+.ice-overlay { --ice-red: #ed3237; --ice-black: #000000; --ice-white: #ffffff; --ice-navy: #1e1954; --ice-muted: #d9d7de; font-family: 'Arial Narrow', Arial, sans-serif; }
+.ice-ov-card { background: color-mix(in oklab, var(--ice-black) 92%, transparent); color: var(--ice-white); border-top: 8px solid var(--ice-red); border-radius: 6px; box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.7); }
+.ice-ov-head { border-bottom: 2px solid var(--ice-red); background: linear-gradient(90deg, var(--ice-navy), var(--ice-black)); }
+.ice-ov-kicker { color: var(--ice-red); font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; font-size: 20px; }
+.ice-ov-title { font-family: 'Arial Narrow', Impact, sans-serif; text-transform: uppercase; font-size: 64px; line-height: 1; font-weight: 800; }
+.ice-ov-row { border-bottom: 1px solid color-mix(in oklab, var(--ice-white) 12%, transparent); }
+.ice-ov-row.is-out { color: var(--ice-muted); }
+.ice-ov-place { font-family: 'Arial Narrow', Impact, sans-serif; color: var(--ice-red); font-weight: 800; font-size: 30px; }
+.ice-ov-bib { color: var(--ice-muted); }
+.ice-ov-sponsors { background: var(--ice-white); }
