@@ -16,6 +16,7 @@ import {
   saveWorkflowStep,
   deleteWorkflowStep,
   sendWorkflowStepTest,
+  sendWorkflowStepToOthers,
   runEmailWorkflowsNow,
   listEventInterestSignups,
 } from "@/lib/email-workflows.functions";
@@ -593,7 +594,7 @@ function StepEditor({
                 if (!raw) return;
                 const to = raw.split(/[\s,;]+/).map((e) => e.trim()).filter((e) => /.+@.+\..+/.test(e));
                 if (!to.length) return toast.error("No valid email addresses");
-                void sendWorkflowStepTest({ data: { stepId: step.id, to } })
+                void sendWorkflowStepToOthers({ data: { stepId: step.id, to } })
                   .then((r: any) => toast.success(`Sent to ${r.to}`))
                   .catch((e: Error) => toast.error(e.message));
               }}

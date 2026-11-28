@@ -9,6 +9,12 @@
 
 # Roadmap
 
+## Project monitoring fixes (28 Nov)
+- [x] Prevent denied browser storage from crashing visitors without editing managed auth files
+- [x] Preserve the YouTube iframe across phone fullscreen transitions
+- [x] Separate admin partner sends from restricted test emails, verify without sending mail
+- [ ] Run regressions, browser checks, resolve findings and publish
+
 ## Sabrina Love shared-email family entries (20 Nov)
 - [x] Keep separate people on one email in imports, restore Denise Brooke's four entries and verify all names/distances in the signed-in event list on phone and desktop; publication requested.
 

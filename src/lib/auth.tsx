@@ -20,7 +20,7 @@ function publishSession(session: Session | null) {
 function startSessionStore() {
   if (sessionStarted) return;
   sessionStarted = true;
-  void supabase.auth.getSession().then(({ data }) => publishSession(data.session));
+  void supabase.auth.getSession().then(({ data }) => publishSession(data.session)).catch(() => publishSession(null));
   supabase.auth.onAuthStateChange((_event, session) => publishSession(session));
 }
 

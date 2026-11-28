@@ -1,9 +1,8 @@
 // ICE race-day surfaces for signed-in users: live stream, knockout board and map jump.
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Map as MapIcon, Maximize2, Minimize2, Radio, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Map as MapIcon, Radio, Trophy } from "lucide-react";
+import { IceStreamVideo } from "@/components/ice-stream-video";
 import { supabase } from "@/integrations/supabase/client";
 import { ICE_ROUND_NOTE, finishPositions, ordinal, useKnockout, youtubeId, type RaceClass } from "@/lib/ice-knockout";
 import { scrollAppTo } from "@/lib/app-scroll";
@@ -54,46 +53,6 @@ const STREAM_START = Date.parse("2026-11-29T08:00:00Z");
 function StreamPlayer({ id }: { id: string }) {
   const [now, setNow] = useState<number | null>(null);
   const [play, setPlay] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [nativeFullscreen, setNativeFullscreen] = useState(false);
-  const playerRef = useRef<HTMLDivElement>(null);
-  const expandButtonRef = useRef<HTMLButtonElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const sync = () => setNativeFullscreen(document.fullscreenElement === playerRef.current);
-    document.addEventListener("fullscreenchange", sync);
-    return () => document.removeEventListener("fullscreenchange", sync);
-  }, []);
-  useEffect(() => {
-    if (!expanded) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setExpanded(false);
-      if (event.key === "Tab") {
-        event.preventDefault();
-        closeButtonRef.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKey);
-      expandButtonRef.current?.focus();
-    };
-  }, [expanded]);
-  async function toggleFullscreen() {
-    if (expanded) { setExpanded(false); return; }
-    if (document.fullscreenElement === playerRef.current && document.fullscreenElement) {
-      await document.exitFullscreen().catch(() => {});
-      return;
-    }
-    if (playerRef.current?.requestFullscreen) {
-      try { await playerRef.current.requestFullscreen(); return; } catch { /* iOS and embedded browsers use the full-window player. */ }
-    }
-    setExpanded(true);
-  }
   useEffect(() => {
     setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -101,26 +60,7 @@ function StreamPlayer({ id }: { id: string }) {
   }, []);
   const left = now === null ? null : STREAM_START - now;
   if (play || (left !== null && left <= 0)) {
-    const player = (
-      <div ref={playerRef} role={expanded ? "dialog" : undefined} aria-modal={expanded ? true : undefined} aria-label={expanded ? "Inner City Enduro live stream" : undefined} className={expanded ? "fixed inset-0 z-[10000] flex flex-col bg-ink text-primary-foreground" : "flex w-full flex-col overflow-hidden rounded-2xl bg-ink text-primary-foreground ring-1 ring-border"}>
-        <div className="flex justify-end p-2">
-          <Button ref={expanded ? closeButtonRef : expandButtonRef} type="button" variant="secondary" size="sm" onClick={() => void toggleFullscreen()} aria-label={expanded || nativeFullscreen ? "Exit video fullscreen" : "Make video fullscreen"} title={expanded || nativeFullscreen ? "Exit fullscreen" : "Fullscreen"}>
-            {expanded || nativeFullscreen ? <Minimize2 /> : <Maximize2 />}
-            {expanded || nativeFullscreen ? "Close fullscreen" : "Fullscreen"}
-          </Button>
-        </div>
-        <div className={expanded || nativeFullscreen ? "min-h-0 flex-1" : "aspect-video w-full"}>
-        <iframe
-          src={`https://www.youtube.com/embed/${id}?autoplay=${play ? 1 : 0}&rel=0&fs=1&playsinline=1`}
-          title="Inner City Enduro live stream"
-          className="h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
-        />
-        </div>
-      </div>
-    );
-    return expanded ? createPortal(player, document.body) : player;
+    return <IceStreamVideo id={id} autoplay={play} />;
   }
   const s = Math.max(0, Math.floor((left ?? 0) / 1000));
   const parts = [
